@@ -2,11 +2,24 @@ import bcrypt from "bcryptjs";
 import mongoose, { type InferSchemaType, type Model } from "mongoose";
 import type { UserRole } from "../types/auth.js";
 
+const AddressSchema = new mongoose.Schema(
+  {
+    street: { type: String, required: true, trim: true },
+    city: { type: String, required: true, trim: true },
+    state: { type: String, required: true, trim: true },
+    zip: { type: String, required: true, trim: true },
+    country: { type: String, required: true, trim: true },
+    isPrimary: { type: Boolean, default: false }
+  },
+  { _id: true, timestamps: true },
+);
+
 const UserSchema = new mongoose.Schema(
   {
     email: { type: String, required: true, lowercase: true, trim: true },
     passwordHash: { type: String, required: true, select: false },
-    role: { type: String, required: true, enum: ["buyer", "seller"] satisfies UserRole[] },
+    role: { type: String, required: true, enum: ["buyer", "seller", "admin"] satisfies UserRole[] },
+    addresses: [AddressSchema],
   },
   { timestamps: true },
 );

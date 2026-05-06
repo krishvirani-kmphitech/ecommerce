@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { User } from "../models/User.js";
+import { Notification } from "../models/Notification.js";
 import { ApiError } from "../utils/ApiError.js";
 import { signAccessToken } from "../utils/jwt.js";
 import type { UserRole } from "../types/auth.js";
@@ -25,6 +26,12 @@ export async function register(params: { email: string; password: string; role: 
 
   const passwordHash = await bcrypt.hash(params.password, 12);
   const user = await User.create({ email, passwordHash, role: params.role });
+
+  await Notification.create({
+    userId: user._id,
+    title: "Welcome to our E-commerce Platform!",
+    message: "Thank you for registering. We're excited to have you on board!",
+  });
 
   const accessToken = signAccessToken({ id: user._id.toString(), role: user.role });
   return { accessToken, user: toPublicUser(user) };

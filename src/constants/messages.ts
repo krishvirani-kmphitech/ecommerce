@@ -7,6 +7,10 @@ export const messages = {
     EMAIL_EXISTS: "Email already registered",
     INVALID_CREDENTIALS: "Invalid email or password",
   },
+  CATEGORIES: {
+    LIST_SUCCESS: "Categories fetched successfully",
+    CREATE_SUCCESS: "Category created successfully",
+  },
   PRODUCTS: {
     LIST_SUCCESS: "Products fetched successfully",
     GET_SUCCESS: "Product fetched successfully",
@@ -21,8 +25,14 @@ export const messages = {
     UPDATE_ITEM_SUCCESS: "Cart item updated",
     REMOVE_ITEM_SUCCESS: "Cart item removed",
   },
-  CHECKOUT: {
-    SUCCESS: "Checkout completed successfully",
+  ORDER: {
+    CHECKOUT_SUCCESS: "Checkout completed successfully",
+    GET_MY_ORDERS_SUCCESS: "My orders fetched successfully",
+    GET_ORDER_DETAILS_SUCCESS: "My order details fetched successfully",
+    CANCEL_ORDER_SUCCESS: "Order cancelled successfully",
+    REJECT_ORDER_SUCCESS: "Order rejected successfully",
+    DELIVERED_ORDER_SUCCESS: "Order delivered successfully",
+    ORDER_ID_REQUIRED: "Order id is required"
   },
   COMMON: {
     OK: "OK",

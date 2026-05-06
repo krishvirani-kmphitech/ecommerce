@@ -4,7 +4,7 @@ const ProductSchema = new mongoose.Schema(
   {
     sellerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
     title: { type: String, required: true, trim: true },
-    category: { type: String, required: true, trim: true, index: true },
+    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true, index: true },
     price: { type: Number, required: true, min: 0 },
     quantity: { type: Number, required: true, min: 0 },
     deletedAt: { type: Date, default: null, index: true },
@@ -13,6 +13,7 @@ const ProductSchema = new mongoose.Schema(
 );
 
 ProductSchema.index({ sellerId: 1, deletedAt: 1 });
+ProductSchema.index({ categoryId: 1, deletedAt: 1 });
 ProductSchema.index({ title: "text" });
 
 export type ProductDoc = InferSchemaType<typeof ProductSchema> & {

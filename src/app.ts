@@ -6,8 +6,12 @@ import { pinoHttp } from "pino-http";
 import { env } from "./config/env.js";
 import { authRouter } from "./routes/authRoutes.js";
 import { cartRouter } from "./routes/cartRoutes.js";
-import { checkoutRouter } from "./routes/checkoutRoutes.js";
+import { orderRouter } from "./routes/orderRoutes.js";
+import { categoriesRouter } from "./routes/categoryRoutes.js";
 import { productsRouter } from "./routes/productRoutes.js";
+import { returnRouter } from "./routes/returnRoutes.js";
+import { reviewRouter } from "./routes/reviewRoutes.js";
+import { addressRouter } from "./routes/addressRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { ApiError } from "./utils/ApiError.js";
 import { logger } from "./utils/logger.js";
@@ -50,9 +54,13 @@ export function createApp(): express.Application {
   });
 
   app.use("/auth", authRouter);
+  app.use("/addresses", addressRouter);
+  app.use("/categories", categoriesRouter);
   app.use("/cart", cartRouter);
-  app.use("/checkout", checkoutRouter);
+  app.use("/orders", orderRouter);
   app.use("/products", productsRouter);
+  app.use("/returns", returnRouter);
+  app.use("/reviews", reviewRouter);
 
   app.use((_req, _res, next) => {
     next(ApiError.notFound("Route not found"));

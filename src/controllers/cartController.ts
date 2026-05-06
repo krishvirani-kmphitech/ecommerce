@@ -42,3 +42,21 @@ export async function removeItem(req: Request, res: Response): Promise<void> {
   sendSuccess(res, { message: messages.CART.REMOVE_ITEM_SUCCESS, data: result });
 }
 
+export async function checkout(req: Request, res: Response): Promise<void> {
+  const buyerId = req.user?.id;
+  if (!buyerId) throw ApiError.unauthorized();
+
+  const body = req.body as {
+    primaryAddress: boolean;
+    address?: { street: string; city: string; state: string; zip: string; country: string };
+  };
+  const idempotencyKey = req.header("idempotency-key") ?? undefined;
+
+  const result = await cartService.checkout({
+    buyerId,
+    idempotencyKey,
+    primaryAddress: body.primaryAddress,
+    address: body.address,
+  });
+  sendSuccess(res, { statusCode: 201, message: messages.ORDER.CHECKOUT_SUCCESS, data: result });
+}

@@ -3,7 +3,7 @@ import { requireAuth, requireRole } from "../middlewares/auth.js";
 import { validateBody } from "../middlewares/validateRequest.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import * as cartController from "../controllers/cartController.js";
-import { addCartItemSchema, updateCartItemSchema } from "../validators/cartValidators.js";
+import { addCartItemSchema, checkoutSchema, updateCartItemSchema } from "../validators/cartValidators.js";
 
 export const cartRouter = Router();
 
@@ -18,3 +18,4 @@ cartRouter.patch(
 );
 cartRouter.delete("/items/:productId", requireAuth, requireRole("buyer"), asyncHandler(cartController.removeItem));
 
+cartRouter.post("/checkout", requireAuth, requireRole("buyer"), validateBody(checkoutSchema), asyncHandler(cartController.checkout));

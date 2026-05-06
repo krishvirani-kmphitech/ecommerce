@@ -1,22 +1,24 @@
 import mongoose, { type InferSchemaType, type Model } from "mongoose";
 
-const OrderItemSchema = new mongoose.Schema(
-  {
-    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true, index: true },
-    titleSnapshot: { type: String, required: true, trim: true },
-    unitPriceSnapshot: { type: Number, required: true, min: 0 },
-    quantity: { type: Number, required: true, min: 1 },
-  },
-  { _id: false },
-);
-
 const OrderSchema = new mongoose.Schema(
   {
     buyerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
     sellerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
-    items: { type: [OrderItemSchema], required: true, default: [] },
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true, index: true },
+    titleSnapshot: { type: String, required: true, trim: true },
+    unitPriceSnapshot: { type: Number, required: true, min: 0 },
+    quantity: { type: Number, required: true, min: 1 },
     totalAmount: { type: Number, required: true, min: 0 },
-    status: { type: String, required: true, enum: ["CONFIRMED"] as const, default: "CONFIRMED" },
+    status: { type: String, required: true, enum: ["CONFIRMED", "REJECTED", "CANCELLED", "OUT_FOR_DELIVERY", "DELIVERED", "ACCEPTED", "RETURNED"] as const, default: "CONFIRMED" },
+    returnableUntil: { type: Date, default: null },
+    shippingAddress: {
+      street: { type: String, required: true, trim: true },
+      city: { type: String, required: true, trim: true },
+      state: { type: String, required: true, trim: true },
+      zip: { type: String, required: true, trim: true },
+      country: { type: String, required: true, trim: true },
+    },
+    isPayout: { type: Boolean, default: false },
     idempotencyKey: { type: String, default: null, trim: true },
   },
   { timestamps: true },
@@ -25,7 +27,7 @@ const OrderSchema = new mongoose.Schema(
 OrderSchema.index({ buyerId: 1, createdAt: -1 });
 OrderSchema.index({ sellerId: 1, createdAt: -1 });
 OrderSchema.index(
-  { buyerId: 1, sellerId: 1, idempotencyKey: 1 },
+  { buyerId: 1, productId: 1, idempotencyKey: 1 },
   {
     unique: true,
     partialFilterExpression: { idempotencyKey: { $type: "string" } },

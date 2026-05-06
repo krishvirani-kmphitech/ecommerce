@@ -4,14 +4,19 @@ import { ApiError } from "../utils/ApiError.js";
 import { messages } from "../constants/messages.js";
 import * as productService from "../services/productService.js";
 
-export async function listPublic(_req: Request, res: Response): Promise<void> {
-  const result = await productService.listPublic();
+export async function listPublic(req: Request, res: Response): Promise<void> {
+  const q = req.validatedQuery as { page: number; limit: number; categoryId?: string };
+  const result = await productService.listPublic({
+    page: q.page,
+    limit: q.limit,
+    ...(q.categoryId !== undefined ? { categoryId: q.categoryId } : {}),
+  });
   sendSuccess(res, { message: messages.PRODUCTS.LIST_SUCCESS, data: result });
 }
 
 export async function listPublicByCategory(req: Request, res: Response): Promise<void> {
-  const category = req.params.category as string;
-  const result = await productService.listPublicByCategory({ category });
+  const categoryId = req.params.categoryId as string;
+  const result = await productService.listPublicByCategory({ categoryId });
   sendSuccess(res, { message: messages.PRODUCTS.LIST_SUCCESS, data: result });
 }
 
@@ -21,9 +26,15 @@ export async function getPublicById(req: Request, res: Response): Promise<void> 
 }
 
 export async function listMine(req: Request, res: Response): Promise<void> {
+  const q = req.validatedQuery as { page: number; limit: number; categoryId?: string };
   const sellerId = req.user?.id;
   if (!sellerId) throw ApiError.unauthorized();
-  const result = await productService.listMine({ sellerId });
+  const result = await productService.listMine({
+    sellerId,
+    page: q.page,
+    limit: q.limit,
+    ...(q.categoryId !== undefined ? { categoryId: q.categoryId } : {}),
+  });
   sendSuccess(res, { message: messages.PRODUCTS.LIST_MINE_SUCCESS, data: result });
 }
 
@@ -31,7 +42,7 @@ export async function create(req: Request, res: Response): Promise<void> {
   const sellerId = req.user?.id;
   if (!sellerId) throw ApiError.unauthorized();
 
-  const body = req.body as { title: string; category: string; price: number; quantity: number };
+  const body = req.body as { title: string; categoryId: string; price: number; quantity: number };
   const result = await productService.create({ sellerId, ...body });
   sendSuccess(res, { statusCode: 201, message: messages.PRODUCTS.CREATE_SUCCESS, data: result });
 }
@@ -40,7 +51,7 @@ export async function update(req: Request, res: Response): Promise<void> {
   const sellerId = req.user?.id;
   if (!sellerId) throw ApiError.unauthorized();
 
-  const patch = req.body as Partial<{ title: string; category: string; price: number; quantity: number }>;
+  const patch = req.body as Partial<{ title: string; categoryId: string; price: number; quantity: number }>;
   const result = await productService.update({
     sellerId,
     productId: req.params.id as string,

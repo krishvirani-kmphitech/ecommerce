@@ -1,12 +1,8 @@
 import Joi from "joi";
 
-export const addCartItemSchema = Joi.object({
-  productId: Joi.string().trim().required(),
-  quantity: Joi.number().integer().min(1).required(),
-}).required();
-
-export const updateCartItemSchema = Joi.object({
-  quantity: Joi.number().integer().min(1).required(),
+export const listOrdersQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(20),
 }).required();
 
 export const checkoutSchema = Joi.object({

@@ -34,3 +34,20 @@ export function validateBody(schema: Joi.Schema): RequestHandler {
   };
 }
 
+export function validateQuery(schema: Joi.Schema): RequestHandler {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    const { value, error } = schema.validate(req.query, {
+      abortEarly: false,
+      stripUnknown: true,
+      convert: true,
+    });
+
+    if (error) {
+      return void next(ApiError.badRequest(messages.AUTH.INVALID_BODY, formatJoiDetails(error.details)));
+    }
+
+    req.validatedQuery = value;
+    next();
+  };
+}
+
