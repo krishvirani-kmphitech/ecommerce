@@ -115,13 +115,13 @@ export async function setPrimaryAddress(params: {
     });
 
     // Set the selected address to primary
-    user.addresses[addressIndex].isPrimary = true;
+    user.addresses[addressIndex]!.isPrimary = true;
     await user.save();
 
     await Notification.create({
         userId,
         title: "Primary Address Updated",
-        message: `Your primary address has been updated to ${user.addresses[addressIndex].street}, ${user.addresses[addressIndex].city}.`
+        message: `Your primary address has been updated to ${user.addresses[addressIndex]!.street}, ${user.addresses[addressIndex]!.city}.`
     });
 
     return user.addresses.map(toPublicAddress);
@@ -149,7 +149,7 @@ export async function deleteAddress(params: {
 
     // If we removed the primary address and there are other addresses, make first one primary
     if (wasRemovalPrimary && user.addresses.length > 0) {
-        user.addresses[0].isPrimary = true;
+        user.addresses[0]!.isPrimary = true;
     }
 
     await user.save();

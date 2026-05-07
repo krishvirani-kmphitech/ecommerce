@@ -34,6 +34,9 @@ export const messages = {
     DELIVERED_ORDER_SUCCESS: "Order delivered successfully",
     ORDER_ID_REQUIRED: "Order id is required"
   },
+  NOTIFICATION: {
+    GET_SUCCESS: "Notification fetched successfully"
+  },
   COMMON: {
     OK: "OK",
   },

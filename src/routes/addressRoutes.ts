@@ -3,7 +3,7 @@ import { requireAuth } from "../middlewares/auth.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { validateBody } from "../middlewares/validateRequest.js";
 import * as addressController from "../controllers/addressController.js";
-import { addAddressSchema, setPrimaryAddressSchema } from "../validators/authValidators.js";
+import { addAddressSchema } from "../validators/authValidators.js";
 
 export const addressRouter = Router();
 
@@ -14,7 +14,7 @@ addressRouter.get("/", requireAuth, asyncHandler(addressController.getAddresses)
 addressRouter.post("/", requireAuth, validateBody(addAddressSchema), asyncHandler(addressController.addAddress));
 
 // Set primary address
-addressRouter.patch("/primary", requireAuth, validateBody(setPrimaryAddressSchema), asyncHandler(addressController.setPrimaryAddress));
+addressRouter.patch("/:id/primary", requireAuth, asyncHandler(addressController.setPrimaryAddress));
 
 // Delete an address
 addressRouter.delete("/:id", requireAuth, asyncHandler(addressController.deleteAddress));

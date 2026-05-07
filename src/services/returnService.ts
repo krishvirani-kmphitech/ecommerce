@@ -87,6 +87,13 @@ export async function createReturnRequest(params: {
     });
 
     await returnRequest.save();
+
+    await Notification.create({
+        userId: returnRequest.sellerId,
+        title: "Return request created by buyer",
+        message: `${returnRequest.orderId} for this order buyer create request for return product`
+    });
+
     return toPublicReturn(returnRequest);
 }
 

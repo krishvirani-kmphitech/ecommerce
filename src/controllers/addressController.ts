@@ -33,7 +33,7 @@ export async function setPrimaryAddress(req: Request, res: Response): Promise<vo
 
     const result = await addressService.setPrimaryAddress({
         userId,
-        addressId: (req.body as { addressId: string }).addressId,
+        addressId: (req.params as { id: string }).id,
     });
 
     sendSuccess(res, { message: "Primary address updated successfully", data: result });

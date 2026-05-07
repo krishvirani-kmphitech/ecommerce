@@ -12,6 +12,7 @@ import { productsRouter } from "./routes/productRoutes.js";
 import { returnRouter } from "./routes/returnRoutes.js";
 import { reviewRouter } from "./routes/reviewRoutes.js";
 import { addressRouter } from "./routes/addressRoutes.js";
+import { notificationRouter } from "./routes/notificationRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { ApiError } from "./utils/ApiError.js";
 import { logger } from "./utils/logger.js";
@@ -61,6 +62,7 @@ export function createApp(): express.Application {
   app.use("/products", productsRouter);
   app.use("/returns", returnRouter);
   app.use("/reviews", reviewRouter);
+  app.use("/notifications", notificationRouter);
 
   app.use((_req, _res, next) => {
     next(ApiError.notFound("Route not found"));
