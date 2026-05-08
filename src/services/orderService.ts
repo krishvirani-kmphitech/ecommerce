@@ -4,6 +4,7 @@ import { Product } from "../models/Product.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Transaction } from "../models/Transaction.js";
 import { Notification } from "../models/Notification.js";
+import { messages } from "../constants/messages.js";
 
 type PublicOrderProduct = {
   productId: string;
@@ -104,7 +105,7 @@ function toSellersOrder(
 }
 
 export async function getMyOrders(params: { buyerId: string; page?: number; limit?: number }): Promise<{ orders: PublicOrder[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
-  const buyerId = ensureObjectId(params.buyerId, "Invalid buyer id");
+  const buyerId = ensureObjectId(params.buyerId, messages.COMMON.INVALID_BUYER);
 
   const page = Math.max(1, params.page ?? 1);
   const limit = Math.min(100, Math.max(1, params.limit ?? 20));
@@ -133,8 +134,8 @@ export async function getMyOrders(params: { buyerId: string; page?: number; limi
 
 export async function getMyOrderDetails(params: { buyerId: string, orderId: string }): Promise<{ order: PublicOrder }> {
 
-  const buyerId = ensureObjectId(params.buyerId, "Invalid buyer id");
-  const orderId = ensureObjectId(params.orderId, "Invalid order id");
+  const buyerId = ensureObjectId(params.buyerId, messages.COMMON.INVALID_BUYER);
+  const orderId = ensureObjectId(params.orderId, messages.COMMON.INVALID_ORDER);
 
   const order = await Order.findOne({ _id: orderId, buyerId })
     // .populate("sellerId", "email")
@@ -149,7 +150,7 @@ export async function getMyOrderDetails(params: { buyerId: string, orderId: stri
 
 export async function getSellerOrder(params: { sellerId: string; page?: number; limit?: number }): Promise<{ orders: PublicOrder[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
 
-  const sellerId = ensureObjectId(params.sellerId, "Invalid seller id")
+  const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER)
   const page = Math.max(1, params.page ?? 1);
   const limit = Math.min(100, Math.max(1, params.limit ?? 20));
   const skip = (page - 1) * limit;
@@ -178,88 +179,114 @@ export async function getSellerOrder(params: { sellerId: string; page?: number; 
 
 export async function cancelOrder(params: { buyerId: string, orderId: string }): Promise<{ order: PublicOrder }> {
 
-  const buyerId = ensureObjectId(params.buyerId, "Invalid buyer id");
-  const orderId = ensureObjectId(params.orderId, "Invalid order id");
+  const buyerId = ensureObjectId(params.buyerId, messages.COMMON.INVALID_BUYER);
+  const orderId = ensureObjectId(params.orderId, messages.COMMON.INVALID_ORDER);
 
-  const order = await Order.findOneAndUpdate(
-    { _id: orderId, buyerId, status: "CONFIRMED" },
-    { $set: { status: "CANCELLED" as const } },
-    { new: true }
-  )
-    .lean()
-    .exec();
-  if (!order) {
-    const existing = await Order.findOne({ _id: orderId, buyerId }).lean().exec();
-    if (!existing) throw ApiError.notFound("Order not found");
-    throw ApiError.conflict(`Cannot cancel order in '${existing.status}' state`);
+  const session = await mongoose.startSession();
+  try {
+    const order = await session.withTransaction(async () => {
+      const updated = await Order.findOneAndUpdate(
+        { _id: orderId, buyerId, status: "CONFIRMED" },
+        { $set: { status: "CANCELLED" as const } },
+        { new: true, session }
+      )
+        .lean()
+        .session(session)
+        .exec();
+
+      if (!updated) {
+        const existing = await Order.findOne({ _id: orderId, buyerId }).lean().session(session).exec();
+        if (!existing) throw ApiError.notFound(messages.COMMON.ORDER_NOT_FOUND);
+        throw ApiError.conflict(`Cannot cancel order in '${existing.status}' state`);
+      }
+
+      await Product.updateOne(
+        { _id: updated.productId },
+        { $inc: { quantity: updated.quantity } },
+        { session },
+      ).exec();
+
+      await Transaction.insertOne(
+        {
+          orderId: updated._id,
+          buyerId: updated.buyerId,
+          type: "refund",
+          amount: updated.totalAmount,
+        },
+        { session },
+      );
+
+      await new Notification({
+        userId: updated.sellerId,
+        title: `Order Cancelled (${updated._id})`,
+        message: `The order for ${updated.titleSnapshot} has been cancelled by the buyer.`,
+      }).save({ session });
+
+      return updated;
+    });
+
+    if (!order) throw ApiError.internal("Unable to cancel order");
+    return { order: toPublicOrder(order as OrderDoc) };
+  } finally {
+    session.endSession();
   }
-
-  await Product.updateOne(
-    { _id: order.productId },
-    { $inc: { quantity: order.quantity } },
-  ).exec();
-
-  await Transaction.insertOne({
-    orderId: order._id,
-    buyerId: order.buyerId,
-    type: "refund",
-    amount: order.totalAmount
-  });
-
-  await Notification.create({
-    userId: order.sellerId,
-    title: `Order Cancelled (${order._id})`,
-    message: `The order for ${order.titleSnapshot} has been cancelled by the buyer.`
-  });
-
-  return { order: toPublicOrder(order as OrderDoc) };
-
 }
 
 export async function rejectOrderBySeller(params: { sellerId: string, orderId: string }): Promise<{ order: PublicOrder }> {
 
-  const sellerId = ensureObjectId(params.sellerId, "Invalid seller id");
-  const orderId = ensureObjectId(params.orderId, "Invalid order id");
+  const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER);
+  const orderId = ensureObjectId(params.orderId, messages.COMMON.INVALID_ORDER);
 
-  const order = await Order.findOneAndUpdate(
-    { _id: orderId, sellerId, status: "CONFIRMED" },
-    { $set: { status: "REJECTED" as const } },
-    { new: true }
-  )
-    .lean()
-    .exec();
-  if (!order) {
-    const existing = await Order.findOne({ _id: orderId, sellerId }).lean().exec();
-    if (!existing) throw ApiError.notFound("Order not found");
-    throw ApiError.conflict(`Cannot reject order in '${existing.status}' state`);
+  const session = await mongoose.startSession();
+
+  try {
+
+    const order = await session.withTransaction(async () => {
+      const updated = await Order.findOneAndUpdate(
+        { _id: orderId, sellerId, status: "CONFIRMED" },
+        { $set: { status: "REJECTED" as const } },
+        { new: true }
+      )
+        .lean()
+        .exec();
+      if (!updated) {
+        const existing = await Order.findOne({ _id: orderId, sellerId }).lean().exec();
+        if (!existing) throw ApiError.notFound(messages.COMMON.ORDER_NOT_FOUND);
+        throw ApiError.conflict(`Cannot reject order in '${existing.status}' state`);
+      }
+
+      await Product.updateOne(
+        { _id: updated.productId },
+        { $inc: { quantity: updated.quantity } },
+      ).exec();
+
+      await Transaction.insertOne({
+        orderId: updated._id,
+        buyerId: updated.buyerId,
+        type: "refund",
+        amount: updated.totalAmount
+      });
+
+      await Notification.create({
+        userId: updated.buyerId,
+        title: `Order rejected (${updated._id})`,
+        message: `The order for ${updated.titleSnapshot} has been rejected by the seller.`
+      });
+
+      return updated;
+
+    });
+
+    return { order: toPublicOrder(order as OrderDoc) };
+  } finally {
+    session.endSession();
   }
-
-  await Product.updateOne(
-    { _id: order.productId },
-    { $inc: { quantity: order.quantity } },
-  ).exec();
-
-  await Transaction.insertOne({
-    orderId: order._id,
-    buyerId: order.buyerId,
-    type: "refund",
-    amount: order.totalAmount
-  });
-
-  await Notification.create({
-    userId: order.buyerId,
-    title: `Order rejected (${order._id})`,
-    message: `The order for ${order.titleSnapshot} has been rejected by the seller.`
-  });
-
-  return { order: toPublicOrder(order as OrderDoc) };
-
 }
 
 export async function outForDeliveryOrder(params: { sellerId: string, orderId: string }): Promise<{ order: PublicOrder }> {
 
-  const sellerId = ensureObjectId(params.sellerId, "Invalid seller id");
-  const orderId = ensureObjectId(params.orderId, "Invalid order id");
+  const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER);
+  const orderId = ensureObjectId(params.orderId, messages.COMMON.INVALID_ORDER);
 
   // Set returnableUntil to 1 hour from now
   const returnableUntil = new Date(Date.now() + 60 * 60 * 1000);
@@ -273,7 +300,7 @@ export async function outForDeliveryOrder(params: { sellerId: string, orderId: s
     .exec();
   if (!order) {
     const existing = await Order.findOne({ _id: orderId, sellerId }).lean().exec();
-    if (!existing) throw ApiError.notFound("Order not found");
+    if (!existing) throw ApiError.notFound(messages.COMMON.ORDER_NOT_FOUND);
     throw ApiError.conflict(`Cannot out for delivery order in '${existing.status}' state`);
   }
 

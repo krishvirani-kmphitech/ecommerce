@@ -5,6 +5,7 @@ import { Review } from "../models/Review.js";
 import { ApiError } from "../utils/ApiError.js";
 import { assertCategoryExists } from "./categoryService.js";
 import { Notification } from "../models/Notification.js";
+import { messages } from "../constants/messages.js";
 
 export type PublicProduct = {
   id: string;
@@ -14,8 +15,9 @@ export type PublicProduct = {
   categoryName: string;
   price: number;
   quantity: number;
-  rating: number | null;
-  deletedAt: Date | null;
+  avgRating: number;
+  ratingCount: number;
+  // deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -40,9 +42,8 @@ function pickCategory(categoryId: unknown): { categoryId: string; categoryName: 
 }
 
 function toPublicProduct(
-  p: Pick<ProductDoc, "_id" | "sellerId" | "title" | "price" | "quantity" | "deletedAt" | "createdAt" | "updatedAt"> & {
+  p: Pick<ProductDoc, "_id" | "sellerId" | "title" | "price" | "quantity" | "avgRating" | "ratingCount" | "createdAt" | "updatedAt"> & {
     categoryId: unknown;
-    rating?: number | null;
   },
 ): PublicProduct {
   const cat = pickCategory(p.categoryId);
@@ -54,29 +55,21 @@ function toPublicProduct(
     categoryName: cat.categoryName,
     price: p.price,
     quantity: p.quantity,
-    rating: p.rating ?? null,
-    deletedAt: p.deletedAt ?? null,
+    avgRating: p.avgRating,
+    ratingCount: p.ratingCount,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
   };
 }
 
-async function loadProductRatings(productIds: mongoose.Types.ObjectId[]): Promise<Map<string, number>> {
-  if (productIds.length === 0) return new Map();
+async function getProductReviews(productId: mongoose.Types.ObjectId, page: number, limit: number): Promise<PublicReview[]> {
 
-  const ratings = await Review.aggregate([
-    { $match: { productId: { $in: productIds } } },
-    { $group: { _id: "$productId", avgRating: { $avg: "$rating" } } },
-  ]).exec();
+  const skip = (page - 1) * limit;
 
-  return new Map(
-    ratings.map((item) => [String(item._id), Math.round(item.avgRating * 100) / 100]),
-  );
-}
-
-async function getProductReviews(productId: mongoose.Types.ObjectId): Promise<PublicReview[]> {
   const reviews = await Review.find({ productId })
     .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
     .lean()
     .exec();
 
@@ -117,9 +110,9 @@ export async function listPublic(params: {
 }> {
   let categoryOid: mongoose.Types.ObjectId | undefined;
   if (params.categoryId !== undefined) {
-    categoryOid = ensureObjectId(params.categoryId, "Invalid category id");
+    categoryOid = ensureObjectId(params.categoryId, messages.COMMON.INVALID_CATEGORY);
     const exists = await Category.exists({ _id: categoryOid }).exec();
-    if (!exists) throw ApiError.notFound("Category not found");
+    if (!exists) throw ApiError.notFound(messages.COMMON.CATEGORY_NOT_FOUND);
   }
 
   const filter = publicCatalogFilter(categoryOid);
@@ -136,16 +129,10 @@ export async function listPublic(params: {
     Product.countDocuments(filter).exec(),
   ]);
 
-  const ratingMap = await loadProductRatings(products.map((p) => new mongoose.Types.ObjectId(p._id)));
   const totalPages = total === 0 ? 0 : Math.ceil(total / params.limit);
 
   return {
-    list: products.map((p) =>
-      toPublicProduct({
-        ...(p as ProductDoc & { categoryId: unknown }),
-        rating: ratingMap.get(String(p._id)) ?? null,
-      }),
-    ),
+    list: products.map((p) => toPublicProduct(p as ProductDoc & { categoryId: unknown })),
     pagination: {
       page: params.page,
       limit: params.limit,
@@ -156,59 +143,47 @@ export async function listPublic(params: {
 }
 
 
-export async function listPublicByCategory(params: { categoryId: string }): Promise<{ list: PublicProduct[] }> {
-  const categoryId = ensureObjectId(params.categoryId, "Invalid category id");
-  const exists = await Category.exists({ _id: categoryId }).exec();
-  if (!exists) throw ApiError.notFound("Category not found");
+// export async function listPublicByCategory(params: { categoryId: string }): Promise<{ list: PublicProduct[] }> {
+//   const categoryId = ensureObjectId(params.categoryId, messages.COMMON.INVALID_CATEGORY);
+//   const exists = await Category.exists({ _id: categoryId }).exec();
+//   if (!exists) throw ApiError.notFound(messages.COMMON.CATEGORY_NOT_FOUND);
 
-  const products = await Product.find({ deletedAt: null, quantity: { $gt: 0 }, categoryId })
-    .populate(categoryPopulate)
-    .sort({ createdAt: -1 })
-    .lean()
-    .exec();
+//   const products = await Product.find({ deletedAt: null, quantity: { $gt: 0 }, categoryId })
+//     .populate(categoryPopulate)
+//     .sort({ createdAt: -1 })
+//     .lean()
+//     .exec();
 
-  const ratingMap = await loadProductRatings(products.map((p) => new mongoose.Types.ObjectId(p._id)));
+//   return {
+//     list: products.map((p) => toPublicProduct(p as ProductDoc & { categoryId: unknown })),
+//   };
+// }
 
-  return {
-    list: products.map((p) =>
-      toPublicProduct({
-        ...(p as ProductDoc & { categoryId: unknown }),
-        rating: ratingMap.get(String(p._id)) ?? null,
-      }),
-    ),
-  };
-}
+export async function getPublicById(params: { productId: string, page: number, limit: number }): Promise<{ product: PublicProduct; reviews: PublicReview[] }> {
+  const _id = ensureObjectId(params.productId, messages.COMMON.INVALID_PRODUCT);
 
-export async function getPublicById(params: { productId: string }): Promise<{ product: PublicProduct; reviews: PublicReview[] }> {
-  const _id = ensureObjectId(params.productId, "Invalid product id");
   const product = await Product.findOne({ _id, deletedAt: null, quantity: { $gt: 0 } })
     .populate(categoryPopulate)
     .lean()
     .exec();
-  if (!product) throw ApiError.notFound("Product not found");
+  if (!product) throw ApiError.notFound(messages.COMMON.PRODUCT_NOT_FOUND);
 
-  const [ratingMap, reviews] = await Promise.all([
-    loadProductRatings([_id]),
-    getProductReviews(_id),
-  ]);
+  const reviews = await getProductReviews(_id, params.page, params.limit);
 
   return {
-    product: toPublicProduct({
-      ...(product as ProductDoc & { categoryId: unknown }),
-      rating: ratingMap.get(String(_id)) ?? null,
-    }),
+    product: toPublicProduct(product as ProductDoc & { categoryId: unknown }),
     reviews,
   };
 }
 
 export async function listMine(params: { sellerId: string; page: number; limit: number; categoryId?: string }): Promise<{ list: PublicProduct[], pagination: { page: number; limit: number; total: number; totalPages: number } }> {
-  const sellerId = ensureObjectId(params.sellerId, "Invalid seller id");
+  const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER);
 
   let categoryOid: mongoose.Types.ObjectId | undefined;
   if (params.categoryId !== undefined) {
-    categoryOid = ensureObjectId(params.categoryId, "Invalid category id");
+    categoryOid = ensureObjectId(params.categoryId, messages.COMMON.INVALID_CATEGORY);
     const exists = await Category.exists({ _id: categoryOid }).exec();
-    if (!exists) throw ApiError.notFound("Category not found");
+    if (!exists) throw ApiError.notFound(messages.COMMON.CATEGORY_NOT_FOUND);
   }
 
   const filter = publicCatalogFilterMine(sellerId, categoryOid);
@@ -246,8 +221,8 @@ export async function create(params: {
   quantity: number;
 }): Promise<{ product: PublicProduct }> {
   await assertCategoryExists(params.categoryId);
-  const sellerId = ensureObjectId(params.sellerId, "Invalid seller id");
-  const categoryOid = ensureObjectId(params.categoryId, "Invalid category id");
+  const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER);
+  const categoryOid = ensureObjectId(params.categoryId, messages.COMMON.INVALID_CATEGORY);
 
   const product = await Product.create({
     sellerId,
@@ -263,8 +238,8 @@ export async function create(params: {
     message: `Your product "${params.title}" has been created successfully.`
   });
 
-  const populated = await Product.findById(product._id).populate(categoryPopulate).lean().exec();
-  if (!populated) throw ApiError.internal("Failed to load product");
+  const populated = await product.populate(categoryPopulate);
+  if (!populated) throw ApiError.internal(messages.COMMON.FAILED_TO_LOAD);
   return { product: toPublicProduct(populated as ProductDoc & { categoryId: unknown }) };
 }
 
@@ -273,8 +248,8 @@ export async function update(params: {
   productId: string;
   patch: Partial<{ title: string; categoryId: string; price: number; quantity: number }>;
 }): Promise<{ product: PublicProduct }> {
-  const sellerId = ensureObjectId(params.sellerId, "Invalid seller id");
-  const productId = ensureObjectId(params.productId, "Invalid product id");
+  const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER);
+  const productId = ensureObjectId(params.productId, messages.COMMON.INVALID_PRODUCT);
 
   const $set: Record<string, unknown> = {};
   if (params.patch.title !== undefined) $set.title = params.patch.title;
@@ -282,14 +257,14 @@ export async function update(params: {
   if (params.patch.quantity !== undefined) $set.quantity = params.patch.quantity;
   if (params.patch.categoryId !== undefined) {
     await assertCategoryExists(params.patch.categoryId);
-    $set.categoryId = ensureObjectId(params.patch.categoryId, "Invalid category id");
+    $set.categoryId = ensureObjectId(params.patch.categoryId, messages.COMMON.INVALID_CATEGORY);
   }
 
   const product = await Product.findOneAndUpdate({ _id: productId, sellerId, deletedAt: null }, { $set }, { new: true })
     .populate(categoryPopulate)
     .lean()
     .exec();
-  if (!product) throw ApiError.notFound("Product not found");
+  if (!product) throw ApiError.notFound(messages.COMMON.PRODUCT_NOT_FOUND);
 
   await Notification.create({
     userId: sellerId,
@@ -301,8 +276,8 @@ export async function update(params: {
 }
 
 export async function softDelete(params: { sellerId: string; productId: string }): Promise<{ product: PublicProduct }> {
-  const sellerId = ensureObjectId(params.sellerId, "Invalid seller id");
-  const productId = ensureObjectId(params.productId, "Invalid product id");
+  const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER);
+  const productId = ensureObjectId(params.productId, messages.COMMON.INVALID_PRODUCT);
 
   const product = await Product.findOneAndUpdate(
     { _id: productId, sellerId, deletedAt: null },
@@ -312,7 +287,7 @@ export async function softDelete(params: { sellerId: string; productId: string }
     .populate(categoryPopulate)
     .lean()
     .exec();
-  if (!product) throw ApiError.notFound("Product not found");
+  if (!product) throw ApiError.notFound(messages.COMMON.PRODUCT_NOT_FOUND);
 
   await Notification.create({
     userId: sellerId,

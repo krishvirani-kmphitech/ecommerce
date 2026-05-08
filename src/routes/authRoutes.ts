@@ -13,3 +13,4 @@ authRouter.post("/login", validateBody(loginSchema), asyncHandler(authController
 
 authRouter.get("/me", requireAuth, asyncHandler(authController.me));
 
+authRouter.delete("/me", requireAuth, asyncHandler(authController.deleteUser));

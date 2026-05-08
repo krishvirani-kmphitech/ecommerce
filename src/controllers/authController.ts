@@ -32,3 +32,10 @@ export async function me(req: Request, res: Response): Promise<void> {
   sendSuccess(res, { message: messages.AUTH.ME_SUCCESS, data: result });
 }
 
+export async function deleteUser(req: Request, res: Response): Promise<void> {
+  const userId = req.user?.id;
+  if (!userId) throw ApiError.unauthorized();
+
+  const result = await authService.deleteUser({ userId });
+  sendSuccess(res, { message: messages.AUTH.DELETED_SUCCESS, data: result });
+}

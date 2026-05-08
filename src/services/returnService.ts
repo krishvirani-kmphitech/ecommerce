@@ -5,6 +5,7 @@ import { Transaction } from "../models/Transaction.js";
 import { Product } from "../models/Product.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Notification } from "../models/Notification.js";
+import { messages } from "../constants/messages.js";
 
 export type PublicReturn = {
     id: string;
@@ -51,8 +52,8 @@ export async function createReturnRequest(params: {
     buyerId: string;
     reason: string;
 }): Promise<PublicReturn> {
-    const orderId = ensureObjectId(params.orderId, "Invalid order id");
-    const buyerId = ensureObjectId(params.buyerId, "Invalid buyer id");
+    const orderId = ensureObjectId(params.orderId, messages.COMMON.INVALID_ORDER);
+    const buyerId = ensureObjectId(params.buyerId, messages.COMMON.INVALID_BUYER);
 
     const order = await Order.findOne({
         _id: orderId,
@@ -61,11 +62,11 @@ export async function createReturnRequest(params: {
     }).exec();
 
     if (!order) {
-        throw ApiError.badRequest("Order not found or not in DELIVERED status");
+        throw ApiError.badRequest(messages.ORDER.ORDER_NOT_IN_DELIVERED);
     }
 
     if (!order.returnableUntil || new Date() > order.returnableUntil) {
-        throw ApiError.badRequest("Return window has expired for this order");
+        throw ApiError.badRequest(messages.ORDER.RETURN_TIME_EXPIRED);
     }
 
     const existingReturn = await Return.findOne({
@@ -74,7 +75,7 @@ export async function createReturnRequest(params: {
     }).exec();
 
     if (existingReturn) {
-        throw ApiError.badRequest("A return request already exists for this order");
+        throw ApiError.badRequest(messages.ORDER.REQUEST_ALREADY_EXIST);
     }
 
     const returnRequest = new Return({
@@ -101,8 +102,8 @@ export async function approveReturn(params: {
     returnId: string;
     sellerId: string;
 }): Promise<PublicReturn> {
-    const returnId = ensureObjectId(params.returnId, "Invalid return id");
-    const sellerId = ensureObjectId(params.sellerId, "Invalid seller id");
+    const returnId = ensureObjectId(params.returnId, messages.COMMON.INVALID_RETURN);
+    const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER);
 
     const session = await mongoose.startSession();
     try {
@@ -116,7 +117,7 @@ export async function approveReturn(params: {
                 .exec();
 
             if (!ret) {
-                throw ApiError.notFound("Return request not found or already processed");
+                throw ApiError.notFound(messages.RETURN.REQUEST_NOT_FOUND_OR_EXIST);
             }
 
             ret.status = "APPROVED";
@@ -170,8 +171,8 @@ export async function rejectReturn(params: {
     sellerId: string;
     notes: string;
 }): Promise<PublicReturn> {
-    const returnId = ensureObjectId(params.returnId, "Invalid return id");
-    const sellerId = ensureObjectId(params.sellerId, "Invalid seller id");
+    const returnId = ensureObjectId(params.returnId, messages.COMMON.INVALID_RETURN);
+    const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER);
 
     const returnRequest = await Return.findOne({
         _id: returnId,
@@ -180,7 +181,7 @@ export async function rejectReturn(params: {
     }).exec();
 
     if (!returnRequest) {
-        throw ApiError.notFound("Return request not found or already processed");
+        throw ApiError.notFound(messages.RETURN.REQUEST_NOT_FOUND_OR_EXIST);
     }
 
     returnRequest.status = "REJECTED";
@@ -202,7 +203,7 @@ export async function getReturnRequests(params: {
     userId: string;
     userRole: "buyer" | "seller";
 }): Promise<PublicReturn[]> {
-    const userId = ensureObjectId(params.userId, "Invalid user id");
+    const userId = ensureObjectId(params.userId, messages.COMMON.INVALID_USER);
 
     const filter = params.userRole === "buyer" ? { buyerId: userId } : { sellerId: userId };
 
@@ -215,8 +216,8 @@ export async function getReturnRequest(params: {
     returnId: string;
     userId: string;
 }): Promise<PublicReturn> {
-    const returnId = ensureObjectId(params.returnId, "Invalid return id");
-    const userId = ensureObjectId(params.userId, "Invalid user id");
+    const returnId = ensureObjectId(params.returnId, messages.COMMON.INVALID_RETURN);
+    const userId = ensureObjectId(params.userId, messages.COMMON.INVALID_USER);
 
     const returnRequest = await Return.findOne({
         _id: returnId,
@@ -224,7 +225,7 @@ export async function getReturnRequest(params: {
     }).exec();
 
     if (!returnRequest) {
-        throw ApiError.notFound("Return request not found");
+        throw ApiError.notFound(messages.RETURN.REQUEST_NOT_FOUND);
     }
 
     return toPublicReturn(returnRequest);

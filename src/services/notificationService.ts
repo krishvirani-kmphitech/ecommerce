@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Notification, NotificationDoc } from "../models/Notification.js";
 import { ApiError } from "../utils/ApiError.js";
+import { messages } from "../constants/messages.js";
 // import { logger } from "../utils/logger.js";
 
 export type PublicNotification = {
@@ -30,7 +31,7 @@ function toPublicNotification(n: Pick<NotificationDoc, "_id" | "userId" | "title
 
 export async function getNotification(params: { userId: string }): Promise<{ list: PublicNotification[] }> {
 
-    const userId = ensureObjectId(params.userId, "UserId not valid");
+    const userId = ensureObjectId(params.userId, messages.COMMON.INVALID_USER);
 
     const notification = await Notification.find({ userId: userId }).sort({ createdAt: -1 }).lean().exec();
     return { list: notification.map((n) => toPublicNotification(n)) };

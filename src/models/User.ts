@@ -20,11 +20,20 @@ const UserSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true, select: false },
     role: { type: String, required: true, enum: ["buyer", "seller", "admin"] satisfies UserRole[] },
     addresses: [AddressSchema],
+    deletedAt: { type: Date, default: null }
   },
   { timestamps: true },
 );
 
-UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index(
+  { email: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      deletedAt: { $eq: null },
+    },
+  }
+);
 
 UserSchema.methods.verifyPassword = async function verifyPassword(password: string): Promise<boolean> {
   return bcrypt.compare(password, this.passwordHash as string);

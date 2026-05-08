@@ -14,14 +14,15 @@ export async function listPublic(req: Request, res: Response): Promise<void> {
   sendSuccess(res, { message: messages.PRODUCTS.LIST_SUCCESS, data: result });
 }
 
-export async function listPublicByCategory(req: Request, res: Response): Promise<void> {
-  const categoryId = req.params.categoryId as string;
-  const result = await productService.listPublicByCategory({ categoryId });
-  sendSuccess(res, { message: messages.PRODUCTS.LIST_SUCCESS, data: result });
-}
+// export async function listPublicByCategory(req: Request, res: Response): Promise<void> {
+//   const categoryId = req.params.categoryId as string;
+//   const result = await productService.listPublicByCategory({ categoryId });
+//   sendSuccess(res, { message: messages.PRODUCTS.LIST_SUCCESS, data: result });
+// }
 
 export async function getPublicById(req: Request, res: Response): Promise<void> {
-  const result = await productService.getPublicById({ productId: req.params.id as string });
+  const q = req.validatedQuery as { page: number; limit: number };
+  const result = await productService.getPublicById({ productId: req.params.id as string, page: q.page, limit: q.limit });
   sendSuccess(res, { message: messages.PRODUCTS.GET_SUCCESS, data: result });
 }
 

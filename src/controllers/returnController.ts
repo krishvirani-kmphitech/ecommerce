@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { ApiError } from "../utils/ApiError.js";
 import { sendSuccess } from "../utils/response.js";
 import * as returnService from "../services/returnService.js";
+import { messages } from "../constants/messages.js";
 
 export async function createReturn(req: Request, res: Response): Promise<void> {
   const buyerId = req.user?.id;
@@ -13,7 +14,7 @@ export async function createReturn(req: Request, res: Response): Promise<void> {
     reason: (req.body as { reason: string }).reason,
   });
 
-  sendSuccess(res, { statusCode: 201, message: "Return request created successfully", data: result });
+  sendSuccess(res, { statusCode: 201, message: messages.RETURN.REQUEST_SUCCESS, data: result });
 }
 
 export async function approveReturn(req: Request, res: Response): Promise<void> {
@@ -25,7 +26,7 @@ export async function approveReturn(req: Request, res: Response): Promise<void> 
     sellerId,
   });
 
-  sendSuccess(res, { message: "Return approved successfully", data: result });
+  sendSuccess(res, { message: messages.RETURN.REQUEST_APPROVE, data: result });
 }
 
 export async function rejectReturn(req: Request, res: Response): Promise<void> {
@@ -38,7 +39,7 @@ export async function rejectReturn(req: Request, res: Response): Promise<void> {
     notes: (req.body as { notes: string }).notes || "",
   });
 
-  sendSuccess(res, { message: "Return rejected successfully", data: result });
+  sendSuccess(res, { message: messages.RETURN.REQUEST_REJECTED, data: result });
 }
 
 export async function getReturns(req: Request, res: Response): Promise<void> {
@@ -51,7 +52,7 @@ export async function getReturns(req: Request, res: Response): Promise<void> {
     userRole,
   });
 
-  sendSuccess(res, { message: "Returns fetched successfully", data: result });
+  sendSuccess(res, { message: messages.RETURN.FETCH_SUCCESS, data: result });
 }
 
 export async function getReturn(req: Request, res: Response): Promise<void> {
@@ -63,5 +64,5 @@ export async function getReturn(req: Request, res: Response): Promise<void> {
     userId,
   });
 
-  sendSuccess(res, { message: "Return fetched successfully", data: result });
+  sendSuccess(res, { message: messages.RETURN.FETCH_SUCCESS, data: result });
 }

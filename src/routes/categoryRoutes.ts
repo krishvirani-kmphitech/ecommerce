@@ -15,3 +15,4 @@ categoriesRouter.post(
   validateBody(createCategorySchema),
   asyncHandler(categoryController.create),
 );
+categoriesRouter.delete("/:categoryId", requireAuth, requireRole("admin"), asyncHandler(categoryController.deleteCategory));

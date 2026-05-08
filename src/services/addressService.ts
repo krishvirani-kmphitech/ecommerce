@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { User } from "../models/User.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Notification } from "../models/Notification.js";
+import { messages } from "../constants/messages.js";
 
 export type PublicAddress = {
     id: string;
@@ -54,10 +55,10 @@ export async function addAddress(params: {
     zip: string;
     country: string;
 }): Promise<PublicAddress> {
-    const userId = ensureObjectId(params.userId, "Invalid user id");
+    const userId = ensureObjectId(params.userId, messages.COMMON.INVALID_USER);
 
     const user = await User.findById(userId).exec();
-    if (!user) throw ApiError.notFound("User not found");
+    if (!user) throw ApiError.notFound(messages.COMMON.USER_NOT_FOUND);
 
     // If this is the first address, make it primary
     const isPrimary = !user.addresses || user.addresses.length === 0;
@@ -84,10 +85,10 @@ export async function addAddress(params: {
 }
 
 export async function getAddresses(params: { userId: string }): Promise<PublicAddress[]> {
-    const userId = ensureObjectId(params.userId, "Invalid user id");
+    const userId = ensureObjectId(params.userId, messages.COMMON.INVALID_USER);
 
     const user = await User.findById(userId).lean().exec();
-    if (!user) throw ApiError.notFound("User not found");
+    if (!user) throw ApiError.notFound(messages.COMMON.USER_NOT_FOUND);
 
     return (user.addresses || []).map(toPublicAddress);
 }
@@ -96,17 +97,17 @@ export async function setPrimaryAddress(params: {
     userId: string;
     addressId: string;
 }): Promise<PublicAddress[]> {
-    const userId = ensureObjectId(params.userId, "Invalid user id");
-    const addressId = ensureObjectId(params.addressId, "Invalid address id");
+    const userId = ensureObjectId(params.userId, messages.COMMON.INVALID_USER);
+    const addressId = ensureObjectId(params.addressId, messages.COMMON.INVALID_ADDRESS);
 
     const user = await User.findById(userId).exec();
-    if (!user) throw ApiError.notFound("User not found");
+    if (!user) throw ApiError.notFound(messages.COMMON.USER_NOT_FOUND);
 
     const addressIndex = (user.addresses || []).findIndex(
         (a) => String(a._id) === String(addressId),
     );
     if (addressIndex === -1) {
-        throw ApiError.notFound("Address not found");
+        throw ApiError.notFound(messages.COMMON.ADDRESS_NOT_FOUND);
     }
 
     // Set all addresses to not primary
@@ -131,17 +132,17 @@ export async function deleteAddress(params: {
     userId: string;
     addressId: string;
 }): Promise<PublicAddress[]> {
-    const userId = ensureObjectId(params.userId, "Invalid user id");
-    const addressId = ensureObjectId(params.addressId, "Invalid address id");
+    const userId = ensureObjectId(params.userId, messages.COMMON.INVALID_USER);
+    const addressId = ensureObjectId(params.addressId, messages.COMMON.INVALID_ADDRESS);
 
     const user = await User.findById(userId).exec();
-    if (!user) throw ApiError.notFound("User not found");
+    if (!user) throw ApiError.notFound(messages.COMMON.USER_NOT_FOUND);
 
     const addressIndex = (user.addresses || []).findIndex(
         (a) => String(a._id) === String(addressId),
     );
     if (addressIndex === -1) {
-        throw ApiError.notFound("Address not found");
+        throw ApiError.notFound(messages.COMMON.ADDRESS_NOT_FOUND);
     }
 
     const wasRemoved = user.addresses.splice(addressIndex, 1);
@@ -160,10 +161,10 @@ export async function deleteAddress(params: {
 export async function getPrimaryAddress(params: {
     userId: string;
 }): Promise<PublicAddress | null> {
-    const userId = ensureObjectId(params.userId, "Invalid user id");
+    const userId = ensureObjectId(params.userId, messages.COMMON.INVALID_USER);
 
     const user = await User.findById(userId).lean().exec();
-    if (!user) throw ApiError.notFound("User not found");
+    if (!user) throw ApiError.notFound(messages.COMMON.USER_NOT_FOUND);
 
     const primary = (user.addresses || []).find((a) => a.isPrimary);
     return primary ? toPublicAddress(primary) : null;

@@ -17,3 +17,13 @@ export async function create(req: Request, res: Response): Promise<void> {
   const result = await categoryService.create({ adminId, name: body.name });
   sendSuccess(res, { statusCode: 201, message: messages.CATEGORIES.CREATE_SUCCESS, data: result });
 }
+
+export async function deleteCategory(req: Request, res: Response): Promise<void> {
+
+  const result = await categoryService.deleteCetagory({
+    categoryId: (req.params as { categoryId: string }).categoryId,
+  });
+
+  sendSuccess(res, { statusCode: 200, message: messages.CATEGORIES.DELETED_SUCCESS, data: result });
+
+}

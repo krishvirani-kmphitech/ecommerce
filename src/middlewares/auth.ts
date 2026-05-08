@@ -2,8 +2,9 @@ import type { NextFunction, Request, Response } from "express";
 import { ApiError } from "../utils/ApiError.js";
 import type { UserRole } from "../types/auth.js";
 import { verifyAccessToken } from "../utils/jwt.js";
+import { User } from "../models/User.js";
 
-export function requireAuth(req: Request, _res: Response, next: NextFunction): void {
+export async function requireAuth(req: Request, _res: Response, next: NextFunction): Promise<void> {
   const header = req.header("authorization");
   if (!header) return void next(ApiError.unauthorized("Missing Authorization header"));
 
@@ -13,6 +14,11 @@ export function requireAuth(req: Request, _res: Response, next: NextFunction): v
   try {
     const payload = verifyAccessToken(token);
     req.user = { id: payload.sub, role: payload.role };
+
+    const isUserActive = await User.findOne({ _id: req.user.id, deletedAt: null }).lean().exec();
+
+    if (!isUserActive) return void next(ApiError.unauthorized());
+
     next();
   } catch {
     next(ApiError.unauthorized("Invalid or expired token"));
