@@ -187,7 +187,7 @@ export async function cancelOrder(params: { buyerId: string, orderId: string }):
     const order = await session.withTransaction(async () => {
       const updated = await Order.findOneAndUpdate(
         { _id: orderId, buyerId, status: "CONFIRMED" },
-        { $set: { status: "CANCELLED" as const } },
+        { $set: { status: "CANCELLED" as const, paymentStatus: "REFUNDED" } },
         { new: true, session }
       )
         .lean()
@@ -244,7 +244,7 @@ export async function rejectOrderBySeller(params: { sellerId: string, orderId: s
     const order = await session.withTransaction(async () => {
       const updated = await Order.findOneAndUpdate(
         { _id: orderId, sellerId, status: "CONFIRMED" },
-        { $set: { status: "REJECTED" as const } },
+        { $set: { status: "REJECTED" as const, paymentStatus: "REFUNDED" } },
         { new: true }
       )
         .lean()
@@ -293,7 +293,7 @@ export async function outForDeliveryOrder(params: { sellerId: string, orderId: s
 
   const order = await Order.findOneAndUpdate(
     { _id: orderId, sellerId, status: "CONFIRMED" },
-    { $set: { status: "OUT_FOR_DELIVERY", returnableUntil } },
+    { $set: { status: "OUT_FOR_DELIVERY", returnableUntil, paymentStatus: "REFUNDED" } },
     { new: true }
   )
     .lean()

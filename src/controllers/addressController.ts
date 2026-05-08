@@ -51,3 +51,14 @@ export async function deleteAddress(req: Request, res: Response): Promise<void> 
 
     sendSuccess(res, { message: messages.ADDRESS.DELETED_SUCCESS, data: result });
 }
+
+export async function getPrimaryAddress(req: Request, res: Response): Promise<void> {
+    const userId = req.user?.id;
+    if (!userId) throw ApiError.unauthorized();
+
+    const result = await addressService.getPrimaryAddress({
+        userId
+    });
+
+    sendSuccess(res, { message: messages.ADDRESS.PRIMARY_FETCH_SUCCESS, data: result });
+}

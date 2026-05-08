@@ -17,7 +17,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"kuldip@gmail.com\",\r\n    \"password\": \"password\",\r\n    \"role\": \"seller\"\r\n}",
+              "raw": "{\r\n    \"email\": \"mohan@gmail.com\",\r\n    \"password\": \"password\",\r\n    \"role\": \"seller\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -172,7 +172,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"kuldip@gmail.com\",\r\n    \"password\": \"password\"\r\n}",
+              "raw": "{\r\n    \"email\": \"fenil@gmail.com\",\r\n    \"password\": \"password\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -467,6 +467,24 @@
               "body": "{\n    \"success\": true,\n    \"message\": \"User profile fetched successfully\",\n    \"data\": {\n        \"user\": {\n            \"id\": \"69f968c5810889de5d7a8341\",\n            \"email\": \"akash@gmail.com\",\n            \"role\": \"admin\"\n        }\n    }\n}"
             }
           ]
+        },
+        {
+          "name": "delete user",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{url}}delete",
+              "host": [
+                "{{url}}delete"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -486,7 +504,7 @@
               "raw": "{\r\n    \"email\": \"ajay@gmail.com\",\r\n    \"password\": \"password\"\r\n}"
             },
             "url": {
-              "raw": "{{url}}products?page=1&limit=10&categoryId=69f9b4de9d5e0202db18ed5d",
+              "raw": "{{url}}products?page=1&limit=10",
               "host": [
                 "{{url}}products"
               ],
@@ -498,10 +516,6 @@
                 {
                   "key": "limit",
                   "value": "10"
-                },
-                {
-                  "key": "categoryId",
-                  "value": "69f9b4de9d5e0202db18ed5d"
                 }
               ]
             }
@@ -603,11 +617,11 @@
                 },
                 {
                   "key": "RateLimit-Remaining",
-                  "value": "975"
+                  "value": "999"
                 },
                 {
                   "key": "RateLimit-Reset",
-                  "value": "277"
+                  "value": "900"
                 },
                 {
                   "key": "Content-Type",
@@ -615,15 +629,15 @@
                 },
                 {
                   "key": "Content-Length",
-                  "value": "730"
+                  "value": "728"
                 },
                 {
                   "key": "ETag",
-                  "value": "W/\"2da-tVdGztGAsrcfr+nGkcB4EBUlpms\""
+                  "value": "W/\"2d8-dJEIzIV+blLIOJRmC1kHxLKAaRE\""
                 },
                 {
                   "key": "Date",
-                  "value": "Wed, 06 May 2026 09:50:37 GMT"
+                  "value": "Thu, 07 May 2026 09:39:18 GMT"
                 },
                 {
                   "key": "Connection",
@@ -635,7 +649,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Products fetched successfully\",\n    \"data\": {\n        \"list\": [\n            {\n                \"id\": \"69fb08235bbde9e55ad2f786\",\n                \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n                \"title\": \"Samsung A35\",\n                \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n                \"categoryName\": \"Electronics\",\n                \"price\": 24500,\n                \"quantity\": 8,\n                \"avgRating\": 4.0,\n                \"ratingCount\": 2,\n                \"deletedAt\": null,\n                \"createdAt\": \"2026-05-06T09:21:39.668Z\",\n                \"updatedAt\": \"2026-05-06T09:42:17.503Z\"\n            },\n            {\n                \"id\": \"69fb06765bbde9e55ad2f77b\",\n                \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n                \"title\": \"Redmi A15\",\n                \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n                \"categoryName\": \"Electronics\",\n                \"price\": 14000,\n                \"quantity\": 10,\n                \"avgRating\": 0,\n                \"ratingCount\": 0,\n                \"deletedAt\": null,\n                \"createdAt\": \"2026-05-06T09:14:30.704Z\",\n                \"updatedAt\": \"2026-05-06T09:14:30.704Z\"\n            }\n        ],\n        \"pagination\": {\n            \"page\": 1,\n            \"limit\": 10,\n            \"total\": 2,\n            \"totalPages\": 1\n        }\n    }\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Products fetched successfully\",\n    \"data\": {\n        \"list\": [\n            {\n                \"id\": \"69fc5066a3234d27c7fba770\",\n                \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n                \"title\": \"samsung a35\",\n                \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n                \"categoryName\": \"Electronics\",\n                \"price\": 34000,\n                \"quantity\": 10,\n                \"avgRating\": 0,\n                \"ratingCount\": 0,\n                \"createdAt\": \"2026-05-07T08:42:14.507Z\",\n                \"updatedAt\": \"2026-05-07T08:42:14.507Z\"\n            },\n            {\n                \"id\": \"69fc4d72a3234d27c7fba758\",\n                \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n                \"title\": \"denim shirt\",\n                \"categoryId\": \"69f9b4de9d5e0202db18ed5d\",\n                \"categoryName\": \"cloth\",\n                \"price\": 900,\n                \"quantity\": 18,\n                \"avgRating\": 2.5,\n                \"ratingCount\": 2,\n                \"createdAt\": \"2026-05-07T08:29:38.433Z\",\n                \"updatedAt\": \"2026-05-07T08:39:47.701Z\"\n            }\n        ],\n        \"pagination\": {\n            \"page\": 1,\n            \"limit\": 10,\n            \"total\": 2,\n            \"totalPages\": 1\n        }\n    }\n}"
             }
           ]
         },
@@ -652,17 +666,27 @@
               "raw": "{\r\n    \"email\": \"ajay@gmail.com\",\r\n    \"password\": \"password\"\r\n}"
             },
             "url": {
-              "raw": "{{url}}products/:id",
+              "raw": "{{url}}products/:slug?page=1&limit=2",
               "host": [
                 "{{url}}products"
               ],
               "path": [
-                ":id"
+                ":slug"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "2"
+                }
               ],
               "variable": [
                 {
-                  "key": "id",
-                  "value": "69fb08235bbde9e55ad2f786"
+                  "key": "slug",
+                  "value": "shirt-111-1"
                 }
               ]
             }
@@ -688,7 +712,7 @@
                   "variable": [
                     {
                       "key": "id",
-                      "value": "69fb08235bbde9e55ad2f786"
+                      "value": "69fc4d72a3234d27c7fba758"
                     }
                   ]
                 }
@@ -763,11 +787,11 @@
                 },
                 {
                   "key": "RateLimit-Remaining",
-                  "value": "974"
+                  "value": "994"
                 },
                 {
                   "key": "RateLimit-Reset",
-                  "value": "184"
+                  "value": "818"
                 },
                 {
                   "key": "Content-Type",
@@ -779,11 +803,11 @@
                 },
                 {
                   "key": "ETag",
-                  "value": "W/\"315-LGInma5/GjK5ZsUzVLggrrmZrXo\""
+                  "value": "W/\"315-cniCRWsABb+7jCREC3RPKSAb0Y4\""
                 },
                 {
                   "key": "Date",
-                  "value": "Wed, 06 May 2026 09:52:10 GMT"
+                  "value": "Thu, 07 May 2026 09:40:41 GMT"
                 },
                 {
                   "key": "Connection",
@@ -795,7 +819,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Product fetched successfully\",\n    \"data\": {\n        \"product\": {\n            \"id\": \"69fb08235bbde9e55ad2f786\",\n            \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n            \"title\": \"Samsung A35\",\n            \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n            \"categoryName\": \"Electronics\",\n            \"price\": 24500,\n            \"quantity\": 8,\n            \"avgRating\": 4.0,\n            \"ratingCount\": 2,\n            \"deletedAt\": null,\n            \"createdAt\": \"2026-05-06T09:21:39.668Z\",\n            \"updatedAt\": \"2026-05-06T09:42:17.503Z\"\n        },\n        \"reviews\": [\n            {\n                \"id\": \"69fb0ed048dc6e67b25227d3\",\n                \"buyerId\": \"69fb05ae5bbde9e55ad2f779\",\n                \"rating\": 4,\n                \"comment\": \"mobile have good display and battery backup\",\n                \"createdAt\": \"2026-05-06T09:50:08.021Z\",\n                \"updatedAt\": \"2026-05-06T09:50:08.021Z\"\n            },\n            {\n                \"id\": \"69fb0e0448dc6e67b25227cf\",\n                \"buyerId\": \"69fb05b95bbde9e55ad2f77a\",\n                \"rating\": 4,\n                \"comment\": \"very good mobile\",\n                \"createdAt\": \"2026-05-06T09:46:44.653Z\",\n                \"updatedAt\": \"2026-05-06T09:46:44.653Z\"\n            }\n        ]\n    }\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Product fetched successfully\",\n    \"data\": {\n        \"product\": {\n            \"id\": \"69fc4d72a3234d27c7fba758\",\n            \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n            \"title\": \"denim shirt\",\n            \"categoryId\": \"69f9b4de9d5e0202db18ed5d\",\n            \"categoryName\": \"cloth\",\n            \"price\": 900,\n            \"quantity\": 18,\n            \"avgRating\": 2.5,\n            \"ratingCount\": 2,\n            \"createdAt\": \"2026-05-07T08:29:38.433Z\",\n            \"updatedAt\": \"2026-05-07T08:39:47.701Z\"\n        },\n        \"reviews\": [\n            {\n                \"id\": \"69fc4fd3a3234d27c7fba76d\",\n                \"buyerId\": \"69fb05b95bbde9e55ad2f77a\",\n                \"rating\": 1,\n                \"comment\": \"product is very bad\",\n                \"createdAt\": \"2026-05-07T08:39:47.643Z\",\n                \"updatedAt\": \"2026-05-07T08:39:47.643Z\"\n            },\n            {\n                \"id\": \"69fc4ecda3234d27c7fba762\",\n                \"buyerId\": \"69fb05ae5bbde9e55ad2f779\",\n                \"rating\": 4,\n                \"comment\": \"mobile have good display and battery backup\",\n                \"createdAt\": \"2026-05-07T08:35:25.795Z\",\n                \"updatedAt\": \"2026-05-07T08:35:25.795Z\"\n            }\n        ]\n    }\n}"
             }
           ]
         },
@@ -920,11 +944,11 @@
                 },
                 {
                   "key": "RateLimit-Remaining",
-                  "value": "970"
+                  "value": "996"
                 },
                 {
                   "key": "RateLimit-Reset",
-                  "value": "105"
+                  "value": "853"
                 },
                 {
                   "key": "Content-Type",
@@ -932,15 +956,15 @@
                 },
                 {
                   "key": "Content-Length",
-                  "value": "740"
+                  "value": "735"
                 },
                 {
                   "key": "ETag",
-                  "value": "W/\"2e4-RNwmZbd/JZtXUJIiZ7MR7j5H6Sg\""
+                  "value": "W/\"2df-FkaxpOR0X6yy8FuRohrg80CPy3E\""
                 },
                 {
                   "key": "Date",
-                  "value": "Wed, 06 May 2026 09:53:29 GMT"
+                  "value": "Thu, 07 May 2026 09:40:06 GMT"
                 },
                 {
                   "key": "Connection",
@@ -952,7 +976,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Seller products fetched successfully\",\n    \"data\": {\n        \"list\": [\n            {\n                \"id\": \"69fb08235bbde9e55ad2f786\",\n                \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n                \"title\": \"Samsung A35\",\n                \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n                \"categoryName\": \"Electronics\",\n                \"price\": 24500,\n                \"quantity\": 8,\n                \"avgRating\": 4.0,\n                \"ratingCount\": 2,\n                \"deletedAt\": null,\n                \"createdAt\": \"2026-05-06T09:21:39.668Z\",\n                \"updatedAt\": \"2026-05-06T09:42:17.503Z\"\n            },\n            {\n                \"id\": \"69fb06765bbde9e55ad2f77b\",\n                \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n                \"title\": \"Redmi A15\",\n                \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n                \"categoryName\": \"Electronics\",\n                \"price\": 14000,\n                \"quantity\": 10,\n                \"avgRating\": 0,\n                \"ratingCount\": 0,\n                \"deletedAt\": null,\n                \"createdAt\": \"2026-05-06T09:14:30.704Z\",\n                \"updatedAt\": \"2026-05-06T09:14:30.704Z\"\n            }\n        ],\n        \"pagination\": {\n            \"page\": 1,\n            \"limit\": 10,\n            \"total\": 2,\n            \"totalPages\": 1\n        }\n    }\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Seller products fetched successfully\",\n    \"data\": {\n        \"list\": [\n            {\n                \"id\": \"69fc5066a3234d27c7fba770\",\n                \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n                \"title\": \"samsung a35\",\n                \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n                \"categoryName\": \"Electronics\",\n                \"price\": 34000,\n                \"quantity\": 10,\n                \"avgRating\": 0,\n                \"ratingCount\": 0,\n                \"createdAt\": \"2026-05-07T08:42:14.507Z\",\n                \"updatedAt\": \"2026-05-07T08:42:14.507Z\"\n            },\n            {\n                \"id\": \"69fc4d72a3234d27c7fba758\",\n                \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n                \"title\": \"denim shirt\",\n                \"categoryId\": \"69f9b4de9d5e0202db18ed5d\",\n                \"categoryName\": \"cloth\",\n                \"price\": 900,\n                \"quantity\": 18,\n                \"avgRating\": 2.5,\n                \"ratingCount\": 2,\n                \"createdAt\": \"2026-05-07T08:29:38.433Z\",\n                \"updatedAt\": \"2026-05-07T08:39:47.701Z\"\n            }\n        ],\n        \"pagination\": {\n            \"page\": 1,\n            \"limit\": 10,\n            \"total\": 2,\n            \"totalPages\": 1\n        }\n    }\n}"
             }
           ]
         },
@@ -1101,7 +1125,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Product created successfully\",\n    \"data\": {\n        \"product\": {\n            \"id\": \"69fb08235bbde9e55ad2f786\",\n            \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n            \"title\": \"Samsung A35\",\n            \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n            \"categoryName\": \"Electronics\",\n            \"price\": 24000,\n            \"quantity\": 10,\n            \"avgRating\": 0,\n            \"ratingCount\": 0,\n            \"deletedAt\": null,\n            \"createdAt\": \"2026-05-06T09:21:39.668Z\",\n            \"updatedAt\": \"2026-05-06T09:21:39.668Z\"\n        }\n    }\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Product created successfully\",\n    \"data\": {\n        \"product\": {\n            \"id\": \"69fb08235bbde9e55ad2f786\",\n            \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n            \"title\": \"Samsung A35\",\n            \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n            \"categoryName\": \"Electronics\",\n            \"price\": 24000,\n            \"quantity\": 10,\n            \"rating\": null,\n            \"deletedAt\": null,\n            \"createdAt\": \"2026-05-06T09:21:39.668Z\",\n            \"updatedAt\": \"2026-05-06T09:21:39.668Z\"\n        }\n    }\n}"
             }
           ]
         },
@@ -1268,7 +1292,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Product updated successfully\",\n    \"data\": {\n        \"product\": {\n            \"id\": \"69fb08235bbde9e55ad2f786\",\n            \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n            \"title\": \"Samsung A35\",\n            \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n            \"categoryName\": \"Electronics\",\n            \"price\": 24500,\n            \"quantity\": 10,\n            \"avgRating\": 4.0,\n            \"ratingCount\": 2,\n            \"deletedAt\": null,\n            \"createdAt\": \"2026-05-06T09:21:39.668Z\",\n            \"updatedAt\": \"2026-05-06T09:24:02.094Z\"\n        }\n    }\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Product updated successfully\",\n    \"data\": {\n        \"product\": {\n            \"id\": \"69fb08235bbde9e55ad2f786\",\n            \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n            \"title\": \"Samsung A35\",\n            \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n            \"categoryName\": \"Electronics\",\n            \"price\": 24500,\n            \"quantity\": 10,\n            \"rating\": null,\n            \"deletedAt\": null,\n            \"createdAt\": \"2026-05-06T09:21:39.668Z\",\n            \"updatedAt\": \"2026-05-06T09:24:02.094Z\"\n        }\n    }\n}"
             }
           ]
         },
@@ -1417,9 +1441,41 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Product deleted successfully\",\n    \"data\": {\n        \"product\": {\n            \"id\": \"69fb08d95bbde9e55ad2f787\",\n            \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n            \"title\": \"sealing fan\",\n            \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n            \"categoryName\": \"Electronics\",\n            \"price\": 6000,\n            \"quantity\": 14,\n            \"avgRating\": 0,\n            \"ratingCount\": 0,\n            \"deletedAt\": \"2026-05-06T09:24:57.294Z\",\n            \"createdAt\": \"2026-05-06T09:24:41.799Z\",\n            \"updatedAt\": \"2026-05-06T09:24:57.294Z\"\n        }\n    }\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Product deleted successfully\",\n    \"data\": {\n        \"product\": {\n            \"id\": \"69fb08d95bbde9e55ad2f787\",\n            \"sellerId\": \"69fb05915bbde9e55ad2f776\",\n            \"title\": \"sealing fan\",\n            \"categoryId\": \"69f9b5f09d5e0202db18ed60\",\n            \"categoryName\": \"Electronics\",\n            \"price\": 6000,\n            \"quantity\": 14,\n            \"rating\": null,\n            \"deletedAt\": \"2026-05-06T09:24:57.294Z\",\n            \"createdAt\": \"2026-05-06T09:24:41.799Z\",\n            \"updatedAt\": \"2026-05-06T09:24:57.294Z\"\n        }\n    }\n}"
             }
           ]
+        },
+        {
+          "name": "disable product",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{url}}products/:productId/disable",
+              "host": [
+                "{{url}}products"
+              ],
+              "path": [
+                ":productId",
+                "disable"
+              ],
+              "variable": [
+                {
+                  "key": "productId",
+                  "value": "69fd710f702215a1d75527cc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "active product (seller)",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
         }
       ]
     },
@@ -1564,7 +1620,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"productId\": \"69fb111b48dc6e67b25227d5\",\r\n    \"quantity\": 2\r\n}",
+              "raw": "{\r\n    \"productId\": \"69fc4d72a3234d27c7fba758\",\r\n    \"quantity\": 1\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2968,7 +3024,7 @@
               "variable": [
                 {
                   "key": "orderId",
-                  "value": "69fc1629b65e6810afe12b73"
+                  "value": "69fc4dc4a3234d27c7fba75b"
                 }
               ]
             }
@@ -3114,7 +3170,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"Electronics\"\r\n}",
+              "raw": "{\r\n    \"name\": \"Food\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -3395,6 +3451,163 @@
               ],
               "cookie": [],
               "body": "{\n    \"success\": true,\n    \"message\": \"Categories fetched successfully\",\n    \"data\": {\n        \"list\": [\n            {\n                \"id\": \"69f9b5539d5e0202db18ed5f\",\n                \"name\": \"accessories\",\n                \"createdAt\": \"2026-05-05T09:16:03.738Z\",\n                \"updatedAt\": \"2026-05-05T09:16:03.738Z\"\n            },\n            {\n                \"id\": \"69f9b4de9d5e0202db18ed5d\",\n                \"name\": \"cloth\",\n                \"createdAt\": \"2026-05-05T09:14:06.884Z\",\n                \"updatedAt\": \"2026-05-05T09:14:06.884Z\"\n            },\n            {\n                \"id\": \"69f9b5089d5e0202db18ed5e\",\n                \"name\": \"jewellery\",\n                \"createdAt\": \"2026-05-05T09:14:48.589Z\",\n                \"updatedAt\": \"2026-05-05T09:14:48.589Z\"\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "delete category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"kuldip@gmail.com\",\r\n    \"password\": \"password\"\r\n}"
+            },
+            "url": {
+              "raw": "{{url}}categories/:categoryId",
+              "host": [
+                "{{url}}categories"
+              ],
+              "path": [
+                ":categoryId"
+              ],
+              "variable": [
+                {
+                  "key": "categoryId",
+                  "value": "69fc1aaa3e34dd5a3e0a7e21"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "delete category",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"kuldip@gmail.com\",\r\n    \"password\": \"password\"\r\n}"
+                },
+                "url": {
+                  "raw": "{{url}}categories/:categoryId",
+                  "host": [
+                    "{{url}}categories"
+                  ],
+                  "path": [
+                    ":categoryId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "categoryId",
+                      "value": "69fc1aaa3e34dd5a3e0a7e21"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "1000;w=900"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "1000"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "997"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "829"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "204"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"cc-zVnnTCCWsl4aAoFfdYd2yWF/PqM\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 07 May 2026 08:11:41 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Category deleted successfully\",\n    \"data\": {\n        \"category\": {\n            \"id\": \"69fc1aaa3e34dd5a3e0a7e21\",\n            \"name\": \"food\",\n            \"createdAt\": \"2026-05-07T04:52:58.849Z\",\n            \"updatedAt\": \"2026-05-07T04:52:58.849Z\"\n        }\n    }\n}"
             }
           ]
         }
@@ -4130,13 +4343,161 @@
           ]
         },
         {
+          "name": "get primary address",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n   \r\n}"
+            },
+            "url": {
+              "raw": "{{url}}addresses/primary",
+              "host": [
+                "{{url}}addresses"
+              ],
+              "path": [
+                "primary"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "get primary address",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n   \r\n}"
+                },
+                "url": {
+                  "raw": "{{url}}addresses/primary",
+                  "host": [
+                    "{{url}}addresses"
+                  ],
+                  "path": [
+                    "primary"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "Cross-Origin-Opener-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Cross-Origin-Resource-Policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "Origin-Agent-Cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "Referrer-Policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "Strict-Transport-Security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "X-Content-Type-Options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "X-DNS-Prefetch-Control",
+                  "value": "off"
+                },
+                {
+                  "key": "X-Download-Options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "X-Permitted-Cross-Domain-Policies",
+                  "value": "none"
+                },
+                {
+                  "key": "X-XSS-Protection",
+                  "value": "0"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "RateLimit-Policy",
+                  "value": "1000;w=900"
+                },
+                {
+                  "key": "RateLimit-Limit",
+                  "value": "1000"
+                },
+                {
+                  "key": "RateLimit-Remaining",
+                  "value": "993"
+                },
+                {
+                  "key": "RateLimit-Reset",
+                  "value": "810"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "267"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"10b-PljF0/rnShcorIsd2N6dP6nc8FI\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 08 May 2026 04:37:22 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Primary address fetched successfully\",\n    \"data\": {\n        \"id\": \"69fd684668f4e16d5023e259\",\n        \"street\": \"nilam\",\n        \"city\": \"surat\",\n        \"state\": \"gujarat\",\n        \"zip\": \"395006\",\n        \"country\": \"india\",\n        \"createdAt\": \"2026-05-08T04:36:22.566Z\",\n        \"updatedAt\": \"2026-05-08T04:36:22.566Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
           "name": "add address",
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"street\": \"vardhman\",\r\n    \"city\": \"surat\",\r\n    \"state\": \"gujarat\",\r\n    \"zip\": \"395006\",\r\n    \"country\": \"india\"\r\n}",
+              "raw": "{\r\n    \"street\": \"nilam\",\r\n    \"city\": \"surat\",\r\n    \"state\": \"gujarat\",\r\n    \"zip\": \"395006\",\r\n    \"country\": \"india\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -4304,7 +4665,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "69fc1cdf7bf67d73af0bd8ef"
+                  "value": "69fd684668f4e16d5023e259"
                 }
               ]
             }
@@ -4456,7 +4817,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "69fb25b00bb4ab782b24d356"
+                  "value": "69fd6499a3c9f869016a35ea"
                 }
               ]
             }
@@ -4744,7 +5105,7 @@
     "bearer": [
       {
         "key": "token",
-        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OWZiMDViOTViYmRlOWU1NWFkMmY3N2EiLCJyb2xlIjoiYnV5ZXIiLCJpYXQiOjE3NzgxMjk2MzQsImV4cCI6MTc3ODEzMzIzNH0.zrj570AaVVDUOF2l-dt-NcFFmBtW68UDf92UrZXfmb4",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OWZiMDVhOTViYmRlOWU1NWFkMmY3NzgiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzgyMjMxNjAsImV4cCI6MTc3ODIyNjc2MH0.vGYfSfbyR6l2o3379KzdO4ttATMd7y5UQ_BdnMEApJA",
         "type": "string"
       }
     ]

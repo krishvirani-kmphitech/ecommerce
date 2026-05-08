@@ -6,6 +6,11 @@ const TransactionSchema = new mongoose.Schema(
         sellerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         buyerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         type: { type: String, enum: ["pay", "refund", "payout"], required: true },
+        status: {
+            type: String,
+            enum: ["PENDING", "SUCCESS", "FAILED"],
+            default: "SUCCESS"
+        },
         amount: { type: Number, required: true }
     },
     { timestamps: true },

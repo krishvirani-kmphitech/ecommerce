@@ -10,6 +10,7 @@ export const listPublicQuerySchema = Joi.object({
 
 export const createProductSchema = Joi.object({
   title: Joi.string().trim().min(1).max(200).required(),
+  description: Joi.string().trim(),
   categoryId: objectIdString,
   price: Joi.number().min(0).required(),
   quantity: Joi.number().integer().min(0).required(),

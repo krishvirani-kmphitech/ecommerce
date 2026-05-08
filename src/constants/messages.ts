@@ -22,7 +22,10 @@ export const messages = {
     LIST_MINE_SUCCESS: "Seller products fetched successfully",
     CREATE_SUCCESS: "Product created successfully",
     UPDATE_SUCCESS: "Product updated successfully",
+    DISABLE_SUCCESS: "Product disable successfully",
     DELETE_SUCCESS: "Product deleted successfully",
+    NOT_FOUND_OR_NOT_DISABLE: "Product not found or not disable",
+    ACTIVE_SUCCESS: "Product active successfully"
   },
   CART: {
     GET_SUCCESS: "Cart fetched successfully",
@@ -63,10 +66,12 @@ export const messages = {
   },
   ADDRESS: {
     SET_PRIMARY_ADDRESS_FIRST: "No primary address found. Please add and set a primary address first.",
+    PRIMARY_ADDRESS_NOT_SET: "Primary address not set",
     ADDRESS_REQUIRED: "Address is required when primaryAddress is false",
     ADD_SUCCESS: "Address added successfully",
     FETCH_SUCCESS: "Addresses fetched successfully",
     PRIMARY_ADD_SUCCESS: "Primary address updated successfully",
+    PRIMARY_FETCH_SUCCESS: "Primary address fetched successfully",
     DELETED_SUCCESS: "Address deleted successfully",
   },
   CATEGORY: {

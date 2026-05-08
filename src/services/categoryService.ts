@@ -3,6 +3,7 @@ import { Category, type CategoryDoc } from "../models/Category.js";
 import { ApiError } from "../utils/ApiError.js";
 import { messages } from "../constants/messages.js";
 import { Product } from "../models/Product.js";
+import slugify from "slugify";
 
 export type PublicCategory = {
   id: string;
@@ -25,6 +26,24 @@ function ensureObjectId(id: string, message: string): mongoose.Types.ObjectId {
   return new mongoose.Types.ObjectId(id);
 }
 
+async function slugMaker(title: string): Promise<string> {
+  const baseSlug = slugify(title, {
+    lower: true,
+    strict: true,
+    trim: true,
+  });
+
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (await Product.exists({ slug })) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  return slug;
+}
+
 export async function list(): Promise<{ list: PublicCategory[] }> {
   const categories = await Category.find({ deletedAt: null }).sort({ name: 1 }).lean().exec();
   return { list: categories.map((c) => toPublicCategory(c as CategoryDoc)) };
@@ -39,7 +58,10 @@ export async function create(params: { adminId: string; name: string }): Promise
   if (dup) throw ApiError.conflict(messages.CATEGORIES.ALREADY_EXISTS);
 
   try {
-    const category = await Category.create({ name, createdBy });
+
+    const slug = await slugMaker(params.name);
+
+    const category = await Category.create({ name, slug, createdBy });
     return { category: toPublicCategory(category) };
   } catch (err: unknown) {
     const code = typeof err === "object" && err !== null && "code" in err ? (err as { code?: unknown }).code : undefined;
@@ -52,7 +74,7 @@ export async function deleteCetagory(params: { categoryId: string }): Promise<{ 
 
   const productExist = await Product.findOne({ categoryId: params.categoryId });
 
-  if(productExist) {
+  if (productExist) {
     throw ApiError.conflict(messages.CATEGORY.PRODUCT_EXIST_IN_CATEGORY);
   }
 

@@ -6,6 +6,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { assertCategoryExists } from "./categoryService.js";
 import { Notification } from "../models/Notification.js";
 import { messages } from "../constants/messages.js";
+import slugify from "slugify";
 
 export type PublicProduct = {
   id: string;
@@ -17,7 +18,21 @@ export type PublicProduct = {
   quantity: number;
   avgRating: number;
   ratingCount: number;
-  // deletedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PublicProductForSeller = {
+  id: string;
+  sellerId: string;
+  title: string;
+  categoryId: string;
+  categoryName: string;
+  price: number;
+  quantity: number;
+  avgRating: number;
+  ratingCount: number;
+  status: "ACTIVE" | "DISABLE" | "DELETED" | "BLOCKED";
   createdAt: Date;
   updatedAt: Date;
 };
@@ -62,11 +77,34 @@ function toPublicProduct(
   };
 }
 
-async function getProductReviews(productId: mongoose.Types.ObjectId, page: number, limit: number): Promise<PublicReview[]> {
+function toPublicProductForSeller(
+  p: Pick<ProductDoc, "_id" | "sellerId" | "title" | "price" | "quantity" | "avgRating" | "ratingCount" | "status" | "createdAt" | "updatedAt"> & {
+    categoryId: unknown;
+  },
+): PublicProductForSeller {
+  const cat = pickCategory(p.categoryId);
+  return {
+    id: String(p._id),
+    sellerId: String(p.sellerId),
+    title: p.title,
+    categoryId: cat.categoryId,
+    categoryName: cat.categoryName,
+    price: p.price,
+    quantity: p.quantity,
+    avgRating: p.avgRating,
+    ratingCount: p.ratingCount,
+    status: p.status,
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
+  };
+}
 
+async function getProductReviews(slug: string, page: number, limit: number): Promise<PublicReview[]> {
+
+  const product = await Product.findOne({ slug });
   const skip = (page - 1) * limit;
 
-  const reviews = await Review.find({ productId })
+  const reviews = await Review.find({ productId: product?._id })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
@@ -89,13 +127,13 @@ function ensureObjectId(id: string, message = "Invalid id"): mongoose.Types.Obje
 }
 
 function publicCatalogFilter(categoryId?: mongoose.Types.ObjectId): Record<string, unknown> {
-  const base = { deletedAt: null, quantity: { $gt: 0 } } as Record<string, unknown>;
+  const base = { status: { $eq: "ACTIVE" }, quantity: { $gt: 0 } } as Record<string, unknown>;
   if (categoryId) base.categoryId = categoryId;
   return base;
 }
 
 function publicCatalogFilterMine(sellerId: mongoose.Types.ObjectId, categoryId?: mongoose.Types.ObjectId): Record<string, unknown> {
-  const base = { deletedAt: null, sellerId: sellerId } as Record<string, unknown>;
+  const base = { status: { $ne: "DELETED" }, sellerId: sellerId } as Record<string, unknown>;
   if (categoryId) base.categoryId = categoryId;
   return base;
 }
@@ -159,16 +197,17 @@ export async function listPublic(params: {
 //   };
 // }
 
-export async function getPublicById(params: { productId: string, page: number, limit: number }): Promise<{ product: PublicProduct; reviews: PublicReview[] }> {
-  const _id = ensureObjectId(params.productId, messages.COMMON.INVALID_PRODUCT);
+export async function getPublicById(params: { slug: string, page: number, limit: number }): Promise<{ product: PublicProduct; reviews: PublicReview[] }> {
 
-  const product = await Product.findOne({ _id, deletedAt: null, quantity: { $gt: 0 } })
+  const product = await Product.findOne({ slug: params.slug, status: "ACTIVE", quantity: { $gt: 0 } })
     .populate(categoryPopulate)
     .lean()
     .exec();
   if (!product) throw ApiError.notFound(messages.COMMON.PRODUCT_NOT_FOUND);
 
-  const reviews = await getProductReviews(_id, params.page, params.limit);
+  // const productId = product._id;
+
+  const reviews = await getProductReviews(params.slug, params.page, params.limit);
 
   return {
     product: toPublicProduct(product as ProductDoc & { categoryId: unknown }),
@@ -203,7 +242,7 @@ export async function listMine(params: { sellerId: string; page: number; limit: 
   const totalPages = total === 0 ? 0 : Math.ceil(total / params.limit);
 
   return {
-    list: products.map((p) => toPublicProduct(p as ProductDoc & { categoryId: unknown })),
+    list: products.map((p) => toPublicProductForSeller(p as ProductDoc & { categoryId: unknown })),
     pagination: {
       page: params.page,
       limit: params.limit,
@@ -213,9 +252,28 @@ export async function listMine(params: { sellerId: string; page: number; limit: 
   };
 }
 
+async function slugMaker(title: string): Promise<string> {
+  const baseSlug = slugify(title, {
+    lower: true,
+    strict: true,
+    trim: true,
+  });
+
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (await Product.exists({ slug })) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  return slug;
+}
+
 export async function create(params: {
   sellerId: string;
   title: string;
+  description: string | null,
   categoryId: string;
   price: number;
   quantity: number;
@@ -224,12 +282,16 @@ export async function create(params: {
   const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER);
   const categoryOid = ensureObjectId(params.categoryId, messages.COMMON.INVALID_CATEGORY);
 
+  const slug = await slugMaker(params.title);
+
   const product = await Product.create({
     sellerId,
     title: params.title,
+    description: params.description,
+    slug,
     categoryId: categoryOid,
     price: params.price,
-    quantity: params.quantity,
+    quantity: params.quantity
   });
 
   await Notification.create({
@@ -260,7 +322,7 @@ export async function update(params: {
     $set.categoryId = ensureObjectId(params.patch.categoryId, messages.COMMON.INVALID_CATEGORY);
   }
 
-  const product = await Product.findOneAndUpdate({ _id: productId, sellerId, deletedAt: null }, { $set }, { new: true })
+  const product = await Product.findOneAndUpdate({ _id: productId, sellerId, status: { $nin: ["DELETED", "BLOCKED"] } }, { $set }, { new: true })
     .populate(categoryPopulate)
     .lean()
     .exec();
@@ -272,7 +334,41 @@ export async function update(params: {
     message: `Your product "${product.title}" has been updated successfully.`
   });
 
-  return { product: toPublicProduct(product as ProductDoc & { categoryId: unknown }) };
+  return { product: toPublicProductForSeller(product as ProductDoc & { categoryId: unknown }) };
+}
+
+export async function disable(params: { sellerId: string, productId: string }): Promise<{ product: PublicProductForSeller }> {
+
+  const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER);
+  const productId = ensureObjectId(params.productId, messages.COMMON.INVALID_PRODUCT);
+
+  const updatedProduct = await Product.findOneAndUpdate(
+    { _id: productId, sellerId, status: { $nin: ["DELETED", "BLOCKED"] } },
+    { $set: { status: "DISABLE" } },
+    { new: true }
+  );
+
+  if (!updatedProduct) throw ApiError.notFound(messages.COMMON.PRODUCT_NOT_FOUND);
+
+  return { product: toPublicProductForSeller(updatedProduct) };
+
+}
+
+export async function active(params: { sellerId: string, productId: string }): Promise<{ product: PublicProductForSeller }> {
+
+  const sellerId = ensureObjectId(params.sellerId, messages.COMMON.INVALID_SELLER);
+  const productId = ensureObjectId(params.productId, messages.COMMON.INVALID_PRODUCT);
+
+  const updatedProduct = await Product.findOneAndUpdate(
+    { _id: productId, sellerId, status: { $eq: "DISABLE" } },
+    { $set: { status: "ACTIVE" } },
+    { new: true }
+  );
+
+  if (!updatedProduct) throw ApiError.notFound(messages.PRODUCTS.NOT_FOUND_OR_NOT_DISABLE);
+
+  return { product: toPublicProductForSeller(updatedProduct) };
+
 }
 
 export async function softDelete(params: { sellerId: string; productId: string }): Promise<{ product: PublicProduct }> {
@@ -280,8 +376,8 @@ export async function softDelete(params: { sellerId: string; productId: string }
   const productId = ensureObjectId(params.productId, messages.COMMON.INVALID_PRODUCT);
 
   const product = await Product.findOneAndUpdate(
-    { _id: productId, sellerId, deletedAt: null },
-    { $set: { deletedAt: new Date() } },
+    { _id: productId, sellerId, status: { $nin: ["DELETED", "BLOCKED"] } },
+    { $set: { deletedAt: new Date(), status: "DELETED" } },
     { new: true },
   )
     .populate(categoryPopulate)
@@ -295,6 +391,6 @@ export async function softDelete(params: { sellerId: string; productId: string }
     message: `Your product "${product.title}" has been deleted successfully.`
   });
 
-  return { product: toPublicProduct(product as ProductDoc & { categoryId: unknown }) };
+  return { product: toPublicProductForSeller(product as ProductDoc & { categoryId: unknown }) };
 }
 

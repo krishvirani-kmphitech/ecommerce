@@ -11,10 +11,12 @@ export const productsRouter = Router();
 productsRouter.get("/mine", requireAuth, requireRole("seller"), validateQuery(listPublicQuerySchema), asyncHandler(productController.listMine));
 productsRouter.post("/", requireAuth, requireRole("seller"), validateBody(createProductSchema), asyncHandler(productController.create));
 productsRouter.patch("/:id", requireAuth, requireRole("seller"), validateBody(updateProductSchema), asyncHandler(productController.update));
+productsRouter.patch("/:productId/disable", requireAuth, requireRole("seller"), asyncHandler(productController.disable));
+productsRouter.patch("/:productId/active", requireAuth, requireRole("seller"), asyncHandler(productController.active));
 productsRouter.delete("/:id", requireAuth, requireRole("seller"), asyncHandler(productController.remove));
 
 // Public catalog
 productsRouter.get("/", validateQuery(listPublicQuerySchema), asyncHandler(productController.listPublic));
 // productsRouter.get("/category/:categoryId", asyncHandler(productController.listPublicByCategory));
-productsRouter.get("/:id", validateQuery(getPublicByIdSchema), asyncHandler(productController.getPublicById));
+productsRouter.get("/:slug", validateQuery(getPublicByIdSchema), asyncHandler(productController.getPublicById));
 

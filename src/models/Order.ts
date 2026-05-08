@@ -9,6 +9,16 @@ const OrderSchema = new mongoose.Schema(
     unitPriceSnapshot: { type: Number, required: true, min: 0 },
     quantity: { type: Number, required: true, min: 1 },
     totalAmount: { type: Number, required: true, min: 0 },
+    paymentMode: {
+      type: String,
+      enum: ["ONLINE", "COD"],
+      default: "ONLINE"
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["PENDING", "PAID", "FAILED", "REFUNDED"],
+      default: "PENDING"
+    },
     status: { type: String, required: true, enum: ["CONFIRMED", "REJECTED", "CANCELLED", "OUT_FOR_DELIVERY", "DELIVERED", "ACCEPTED", "RETURNED"] as const, default: "CONFIRMED" },
     returnableUntil: { type: Date, default: null },
     shippingAddress: {

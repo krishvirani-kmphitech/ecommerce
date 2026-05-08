@@ -11,7 +11,6 @@ export type PublicAddress = {
     state: string;
     zip: string;
     country: string;
-    isPrimary: boolean;
     createdAt: Date;
     updatedAt: Date;
 };
@@ -23,7 +22,6 @@ type AddressDocument = {
     state: string;
     zip: string;
     country: string;
-    isPrimary?: boolean;
     createdAt: Date;
     updatedAt: Date;
 };
@@ -41,7 +39,6 @@ function toPublicAddress(address: AddressDocument): PublicAddress {
         state: address.state,
         zip: address.zip,
         country: address.country,
-        isPrimary: address.isPrimary || false,
         createdAt: address.createdAt,
         updatedAt: address.updatedAt,
     };
@@ -60,16 +57,12 @@ export async function addAddress(params: {
     const user = await User.findById(userId).exec();
     if (!user) throw ApiError.notFound(messages.COMMON.USER_NOT_FOUND);
 
-    // If this is the first address, make it primary
-    const isPrimary = !user.addresses || user.addresses.length === 0;
-
     const address = {
         street: params.street,
         city: params.city,
         state: params.state,
         zip: params.zip,
-        country: params.country,
-        isPrimary,
+        country: params.country
     };
 
     user.addresses.push(address as AddressDocument);
@@ -110,13 +103,7 @@ export async function setPrimaryAddress(params: {
         throw ApiError.notFound(messages.COMMON.ADDRESS_NOT_FOUND);
     }
 
-    // Set all addresses to not primary
-    user.addresses.forEach((a) => {
-        a.isPrimary = false;
-    });
-
-    // Set the selected address to primary
-    user.addresses[addressIndex]!.isPrimary = true;
+    user.primaryAddressId = addressId;
     await user.save();
 
     await Notification.create({
@@ -146,11 +133,10 @@ export async function deleteAddress(params: {
     }
 
     const wasRemoved = user.addresses.splice(addressIndex, 1);
-    const wasRemovalPrimary = wasRemoved[0]?.isPrimary;
+    const wasRemovalPrimary = user.primaryAddressId?.equals(wasRemoved[0]?._id);
 
-    // If we removed the primary address and there are other addresses, make first one primary
-    if (wasRemovalPrimary && user.addresses.length > 0) {
-        user.addresses[0]!.isPrimary = true;
+    if (wasRemovalPrimary) {
+        user.primaryAddressId = null;
     }
 
     await user.save();
@@ -158,14 +144,19 @@ export async function deleteAddress(params: {
     return user.addresses.map(toPublicAddress);
 }
 
-export async function getPrimaryAddress(params: {
-    userId: string;
-}): Promise<PublicAddress | null> {
+export async function getPrimaryAddress(params: { userId: string; }): Promise<PublicAddress> {
     const userId = ensureObjectId(params.userId, messages.COMMON.INVALID_USER);
 
     const user = await User.findById(userId).lean().exec();
     if (!user) throw ApiError.notFound(messages.COMMON.USER_NOT_FOUND);
 
-    const primary = (user.addresses || []).find((a) => a.isPrimary);
-    return primary ? toPublicAddress(primary) : null;
+    const primaryAddressId = user.primaryAddressId;
+
+    if (!primaryAddressId) throw ApiError.notFound(messages.ADDRESS.PRIMARY_ADDRESS_NOT_SET);
+
+    const primary = (user.addresses || []).find((a) => a._id.equals(primaryAddressId));
+
+    if (!primary) throw ApiError.notFound(messages.ADDRESS.PRIMARY_ADDRESS_NOT_SET);
+
+    return toPublicAddress(primary);
 }

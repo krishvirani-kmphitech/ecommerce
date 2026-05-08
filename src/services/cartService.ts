@@ -167,7 +167,7 @@ async function loadCartWithProductDetails(cartId: mongoose.Types.ObjectId): Prom
 }
 
 async function ensurePurchasableProduct(productId: mongoose.Types.ObjectId): Promise<Pick<ProductDoc, "_id" | "quantity" | "deletedAt">> {
-  const product = await Product.findById(productId).select({ quantity: 1, deletedAt: 1 }).lean().exec();
+  const product = await Product.findOne({ _id: productId, status: "ACTIVE" }).select({ quantity: 1, deletedAt: 1 }).lean().exec();
   if (!product || product.deletedAt) throw ApiError.notFound(messages.COMMON.PRODUCT_NOT_FOUND);
   return product as Pick<ProductDoc, "_id" | "quantity" | "deletedAt">;
 }
@@ -297,7 +297,7 @@ export async function checkout(params: {
 
       for (const i of items) {
         const res = await Product.updateOne(
-          { _id: i.productId, deletedAt: null, quantity: { $gte: i.quantity } },
+          { _id: i.productId, status: "ACTIVE", quantity: { $gte: i.quantity } },
           { $inc: { quantity: -i.quantity } },
           { session },
         ).exec();
@@ -316,6 +316,7 @@ export async function checkout(params: {
           unitPriceSnapshot: p.price,
           quantity: i.quantity,
           totalAmount: p.price * i.quantity,
+          paymentStatus: "PAID",
           status: "CONFIRMED" as const,
           shippingAddress,
           ...(idempotencyKey ? { idempotencyKey } : {}),

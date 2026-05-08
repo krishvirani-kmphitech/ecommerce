@@ -22,7 +22,7 @@ export async function listPublic(req: Request, res: Response): Promise<void> {
 
 export async function getPublicById(req: Request, res: Response): Promise<void> {
   const q = req.validatedQuery as { page: number; limit: number };
-  const result = await productService.getPublicById({ productId: req.params.id as string, page: q.page, limit: q.limit });
+  const result = await productService.getPublicById({ slug: req.params.slug as string, page: q.page, limit: q.limit });
   sendSuccess(res, { message: messages.PRODUCTS.GET_SUCCESS, data: result });
 }
 
@@ -43,7 +43,7 @@ export async function create(req: Request, res: Response): Promise<void> {
   const sellerId = req.user?.id;
   if (!sellerId) throw ApiError.unauthorized();
 
-  const body = req.body as { title: string; categoryId: string; price: number; quantity: number };
+  const body = req.body as { title: string; description: string, categoryId: string; price: number; quantity: number };
   const result = await productService.create({ sellerId, ...body });
   sendSuccess(res, { statusCode: 201, message: messages.PRODUCTS.CREATE_SUCCESS, data: result });
 }
@@ -59,6 +59,29 @@ export async function update(req: Request, res: Response): Promise<void> {
     patch,
   });
   sendSuccess(res, { message: messages.PRODUCTS.UPDATE_SUCCESS, data: result });
+}
+
+export async function disable(req: Request, res: Response): Promise<void> {
+  const sellerId = req.user?.id;
+  if (!sellerId) throw ApiError.unauthorized();
+
+  const result = await productService.disable({
+    sellerId,
+    productId: req.params.productId as string
+  });
+  sendSuccess(res, { message: messages.PRODUCTS.DISABLE_SUCCESS, data: result });
+
+}
+
+export async function active(req: Request, res: Response): Promise<void> {
+  const sellerId = req.user?.id;
+  if (!sellerId) throw ApiError.unauthorized();
+
+  const result = await productService.active({
+    sellerId,
+    productId: req.params.productId as string
+  });
+  sendSuccess(res, { message: messages.PRODUCTS.ACTIVE_SUCCESS, data: result });
 }
 
 export async function remove(req: Request, res: Response): Promise<void> {

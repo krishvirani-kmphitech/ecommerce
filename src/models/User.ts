@@ -9,7 +9,6 @@ const AddressSchema = new mongoose.Schema(
     state: { type: String, required: true, trim: true },
     zip: { type: String, required: true, trim: true },
     country: { type: String, required: true, trim: true },
-    isPrimary: { type: Boolean, default: false }
   },
   { _id: true, timestamps: true },
 );
@@ -20,6 +19,7 @@ const UserSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true, select: false },
     role: { type: String, required: true, enum: ["buyer", "seller", "admin"] satisfies UserRole[] },
     addresses: [AddressSchema],
+    primaryAddressId: { type: mongoose.Schema.Types.ObjectId, default: null },
     deletedAt: { type: Date, default: null }
   },
   { timestamps: true },

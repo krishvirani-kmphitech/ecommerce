@@ -10,6 +10,9 @@ export const addressRouter = Router();
 // Get all addresses for the user
 addressRouter.get("/", requireAuth, asyncHandler(addressController.getAddresses));
 
+// Get primary address
+addressRouter.get("/primary", requireAuth, asyncHandler(addressController.getPrimaryAddress))
+
 // Add a new address
 addressRouter.post("/", requireAuth, validateBody(addAddressSchema), asyncHandler(addressController.addAddress));
 
